@@ -7,7 +7,7 @@
   <img src="ckad.png" alt="CKAD EXAM 2025">
 </p>
 
-> This guide is part of our blog [How to Pass Certified Kubernetes Application Developer (CKAD) 2025 ](https://techwithmohamed.com/ckad-exam-study-guide/).
+> This guide is part of our blog [How to Pass Certified Kubernetes Application Developer (CKAD) 2025 ](https://techwithmohamed.com/blog/ckad-exam-study-guide/).
 
 ## Hit the Star! :star:
 > If you are using this repo for guidance, please hit the star. Thanks A lot !
