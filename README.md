@@ -34,11 +34,11 @@ The [Certified Kubernetes Application Developer (CKAD) certification](https://ww
 
 | **🧩 Domain** | **📋 Key Concepts** | **🎯 Weight** |
 |--------------|---------------------|---------------|
-| 🛠️[**Application Design and Build - 20%**](#-application-design-and-build-20) | - Define, build and modify container images<br>- Choose and use the right workload resource (Deployment, DaemonSet, CronJob, etc.)<br>- Understand multi-container Pod design patterns (e.g. sidecar, init and others)<br>- Utilize persistent and ephemeral volumes | 20% |
+| 🛠️ [**Application Design and Build - 20%**](#-application-design-and-build-20) | - Define, build and modify container images<br>- Choose and use the right workload resource (Deployment, DaemonSet, CronJob, etc.)<br>- Understand multi-container Pod design patterns (e.g. sidecar, init and others)<br>- Utilize persistent and ephemeral volumes | 20% |
 | 🚀 [**Application Deployment - 20%**](#-application-deployment-20) | - Use Kubernetes primitives to implement common deployment strategies (e.g. blue/green or canary)<br>- Understand Deployments and how to perform rolling updates<br>- Use the Helm package manager to deploy existing packages<br>- Kustomize | 20% |
 | 🔍 [**Application Observability and Maintenance - 15%**](#-application-observability-and-maintenance-15) | - Understand API deprecations<br>- Implement probes and health checks<br>- Use built-in CLI tools to monitor Kubernetes applications<br>- Utilize container logs<br>- Debugging in Kubernetes | 15% |
-| 🔐  [**Application Environment, Configuration, and Security - 25%**](#-application-environment-configuration-and-security-25) | - Discover and use resources that extend Kubernetes (CRD, Operators)<br>- Understand authentication, authorization and admission control<br>- Understand requests, limits, quotas<br>- Understand ConfigMaps<br>- Define resource requirements<br>- Create & consume Secrets<br>- Understand ServiceAccounts<br>- Understand Application Security (SecurityContexts, Capabilities, etc.) | 25% |
-| 🌐  [**Services & Networking - 20%**](#-services-and-networking-20) | - Demonstrate basic understanding of NetworkPolicies<br>- Provide and troubleshoot access to applications via services<br>- Use Ingress rules to expose applications | 20% |
+| 🔐 [**Application Environment, Configuration, and Security - 25%**](#-application-environment-configuration-and-security-25) | - Discover and use resources that extend Kubernetes (CRD, Operators)<br>- Understand authentication, authorization and admission control<br>- Understand requests, limits, quotas<br>- Understand ConfigMaps<br>- Define resource requirements<br>- Create & consume Secrets<br>- Understand ServiceAccounts<br>- Understand Application Security (SecurityContexts, Capabilities, etc.) | 25% |
+| 🌐 [**Services & Networking - 20%**](#-services-and-networking-20) | - Demonstrate basic understanding of NetworkPolicies<br>- Provide and troubleshoot access to applications via services<br>- Use Ingress rules to expose applications | 20% |
 
 
 ## 🛠️ Application Design and Build (20%)
@@ -438,28 +438,26 @@ securityContext:
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
 - [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 
+## 🌐 Services and Networking (20%)
 
+This section covers **20% of the CKAD exam** and focuses on exposing applications and controlling their communication. Mastering Services, Ingress, and NetworkPolicies is essential to ensure your apps are reachable, secure, and observable.
 
+---
 
-## Services And Networking (20%)
+### 🔐 1. Basic NetworkPolicies for Pod Communication
+NetworkPolicies control how Pods communicate with each other and with other network endpoints.
 
-This domain constitutes 20% of the CKAD Exam. Below are the key topics explained with `kubectl` examples:
-
-### 1. Demonstrate Basic Understanding of NetworkPolicies
-NetworkPolicies are used to control the communication between Pods and network endpoints.
-
-#### Example:
-**Create a NetworkPolicy to Allow Traffic from a Specific Pod:**
+#### 🛡️ Example: Restrict traffic to only allow access from a specific Pod
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-specific-pod
+  name: allow-frontend
   namespace: default
 spec:
   podSelector:
     matchLabels:
-      app: web
+      app: backend
   ingress:
   - from:
     - podSelector:
@@ -469,98 +467,89 @@ spec:
     - protocol: TCP
       port: 80
 ```
+
 ```bash
-kubectl apply -f networkpolicy.yaml
+kubectl apply -f allow-frontend.yaml
+kubectl describe networkpolicy allow-frontend
 ```
 
-**Verify NetworkPolicy:**
-```bash
-kubectl describe networkpolicy allow-specific-pod
-```
+👉 [K8s Network Policy Docs](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 
-- [Learn more about NetworkPolicies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+---
 
-### 2. Provide and Troubleshoot Access to Applications via Services
-Services enable access to applications running in Pods.
+### 🌐 2. Accessing Applications via Services
+Kubernetes Services expose Pods internally or externally and load balance traffic between them.
 
-#### Example:
-**Create a ClusterIP Service:**
+#### 🎯 Example: Create a ClusterIP Service
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-service
+  name: my-app-svc
 spec:
   selector:
-    app: web
+    app: my-app
   ports:
-  - protocol: TCP
-    port: 80
+  - port: 80
     targetPort: 8080
 ```
+
 ```bash
-kubectl apply -f service.yaml
+kubectl apply -f my-app-svc.yaml
+kubectl get svc my-app-svc
+kubectl exec -it <pod-name> -- curl http://my-app-svc
 ```
 
-**Test Service Access:**
+🔍 Troubleshoot:
 ```bash
-kubectl get svc my-service
-kubectl exec -it <pod-name> -- curl http://my-service
+kubectl describe svc my-app-svc
+kubectl get endpoints my-app-svc
 ```
 
-**Troubleshoot Service:**
-```bash
-kubectl describe svc my-service
-kubectl get endpoints my-service
-```
+👉 [Service Types Explained](https://kubernetes.io/docs/concepts/services-networking/service/)
 
-- [Learn more about Services](https://kubernetes.io/docs/concepts/services-networking/service/)
+---
 
-### 3. Use Ingress Rules to Expose Applications
-Ingress exposes HTTP and HTTPS routes to services within the cluster.
+### 🌍 3. Use Ingress to Expose Services
+Ingress enables HTTP and HTTPS access to your cluster services using a single IP or DNS hostname.
 
-#### Example:
-**Create an Ingress Resource:**
+#### 🌐 Example: Basic Ingress Resource
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: example-ingress
+  name: demo-ingress
 spec:
   rules:
-  - host: example.com
+  - host: demo.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: my-service
+            name: my-app-svc
             port:
               number: 80
 ```
+
 ```bash
 kubectl apply -f ingress.yaml
+kubectl get ingress demo-ingress
+curl -H "Host: demo.local" http://<ingress-ip>
 ```
 
-**Verify Ingress:**
-```bash
-kubectl get ingress example-ingress
-```
-
-**Test Ingress Access:**
-```bash
-curl -H "Host: example.com" <ingress-ip>
-```
-
-- [Learn more about Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+👉 [Ingress Concepts](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 
 ---
 
-### Resources to Prepare
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
+### 📚 Resources
+- [CKAD Official Curriculum](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/)
 - [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [CKAD Exam Tips](https://kubernetes.io/docs/certifications/)
+- [NetworkPolicies Guide](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+- [Ingress Controllers Overview](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
+
+
 
 ## 🚀 Application Deployment (20%)
 
