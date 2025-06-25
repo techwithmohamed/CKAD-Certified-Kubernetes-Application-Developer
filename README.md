@@ -37,7 +37,7 @@ The [Certified Kubernetes Application Developer (CKAD) certification](https://ww
 | 🛠️[**Application Design and Build - 20%**](#-application-design-and-build-20) | - Define, build and modify container images<br>- Choose and use the right workload resource (Deployment, DaemonSet, CronJob, etc.)<br>- Understand multi-container Pod design patterns (e.g. sidecar, init and others)<br>- Utilize persistent and ephemeral volumes | 20% |
 | 🚀 [**Application Deployment - 20%**](#application-deployment-20) | - Use Kubernetes primitives to implement common deployment strategies (e.g. blue/green or canary)<br>- Understand Deployments and how to perform rolling updates<br>- Use the Helm package manager to deploy existing packages<br>- Kustomize | 20% |
 | 🔍 [**Application Observability and Maintenance - 15%**](#application-observability-and-maintenance-15) | - Understand API deprecations<br>- Implement probes and health checks<br>- Use built-in CLI tools to monitor Kubernetes applications<br>- Utilize container logs<br>- Debugging in Kubernetes | 15% |
-| 🔐  [**Application Environment, Configuration, and Security - 25%**](#application-environment-configuration-and-security-25) | - Discover and use resources that extend Kubernetes (CRD, Operators)<br>- Understand authentication, authorization and admission control<br>- Understand requests, limits, quotas<br>- Understand ConfigMaps<br>- Define resource requirements<br>- Create & consume Secrets<br>- Understand ServiceAccounts<br>- Understand Application Security (SecurityContexts, Capabilities, etc.) | 25% |
+| 🔐  [**Application Environment, Configuration, and Security - 25%**](#-application-environment-configuration-and-security-25) | - Discover and use resources that extend Kubernetes (CRD, Operators)<br>- Understand authentication, authorization and admission control<br>- Understand requests, limits, quotas<br>- Understand ConfigMaps<br>- Define resource requirements<br>- Create & consume Secrets<br>- Understand ServiceAccounts<br>- Understand Application Security (SecurityContexts, Capabilities, etc.) | 25% |
 | 🌐  [**Services & Networking - 20%**](#services-and-networking-20) | - Demonstrate basic understanding of NetworkPolicies<br>- Provide and troubleshoot access to applications via services<br>- Use Ingress rules to expose applications | 20% |
 
 
@@ -213,16 +213,16 @@ kubectl apply -f pod.yaml
 
 ---
 
+## 🔐 Application Environment, Configuration, and Security (25%)
 
-## Application Environment, Configuration, and Security (25%)
+This domain accounts for **25% of the CKAD 2025 exam**. It focuses on managing app configurations, sensitive data, security policies, and access controls. These are essential for building secure and production-ready workloads.
 
-This domain constitutes 25% of the CKAD Exam. Below are the key topics explained with `kubectl` examples:
+### 🔧 1. Discover and Use Resources that Extend Kubernetes (CRDs, Operators)
 
-### 1. Discover and Use Resources that Extend Kubernetes (CRD, Operators)
-Custom Resource Definitions (CRDs) and Operators extend Kubernetes functionality by defining and managing custom resources.
+Custom Resource Definitions (CRDs) and Operators extend Kubernetes with new APIs or automate complex app management.
 
-#### Example:
-**Create a CRD:**
+#### ✅ Real-World Task: Register a custom resource
+
 ```yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -232,9 +232,7 @@ spec:
   group: example.com
   names:
     kind: Widget
-    listKind: WidgetList
     plural: widgets
-    singular: widget
   scope: Namespaced
   versions:
   - name: v1
@@ -250,22 +248,21 @@ spec:
               size:
                 type: string
 ```
+
 ```bash
 kubectl apply -f crd.yaml
 ```
 
-- [Learn more about CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/)
+👉 [CRDs Overview](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/)
 
-### 2. Understand Authentication, Authorization, and Admission Control
-Authentication identifies users, authorization controls access, and admission control manages resource configurations.
+---
 
-#### Example:
-**View authentication configuration:**
-```bash
-kubectl describe configmap -n kube-system extension-apiserver-authentication
-```
+### 🔐 2. Understand Authentication, Authorization, and Admission Control
 
-**Create a Role and RoleBinding:**
+Control who can do what in your cluster with RBAC, and enforce policies with admission controllers.
+
+#### ✅ Real-World Task: Create a Role and RoleBinding
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -277,6 +274,7 @@ rules:
   resources: ["pods"]
   verbs: ["get", "watch", "list"]
 ```
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -292,46 +290,32 @@ roleRef:
   name: pod-reader
   apiGroup: rbac.authorization.k8s.io
 ```
-```bash
-kubectl apply -f role.yaml
-kubectl apply -f rolebinding.yaml
-```
 
-- [Learn more about RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+👉 [RBAC Docs](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 
-### 3. Understand Requests, Limits, and Quotas
-Requests and limits define resource usage for containers, while quotas control resource usage at the namespace level.
+---
 
-#### Example:
-**Set resource requests and limits for a Pod:**
+### 📏 3. Understand Requests, Limits, and Quotas
+
+Resource constraints are essential in multi-tenant clusters. Use them to control CPU/memory allocation.
+
 ```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: resource-demo
-spec:
-  containers:
-  - name: busybox
-    image: busybox
-    resources:
-      requests:
-        memory: "64Mi"
-        cpu: "250m"
-      limits:
-        memory: "128Mi"
-        cpu: "500m"
-```
-```bash
-kubectl apply -f pod.yaml
+resources:
+  requests:
+    cpu: "250m"
+    memory: "64Mi"
+  limits:
+    cpu: "500m"
+    memory: "128Mi"
 ```
 
-**Set a Resource Quota:**
+Define a namespace-wide quota:
+
 ```yaml
 apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: compute-quota
-  namespace: default
 spec:
   hard:
     pods: "10"
@@ -340,154 +324,121 @@ spec:
     limits.cpu: "8"
     limits.memory: "4Gi"
 ```
-```bash
-kubectl apply -f resource-quota.yaml
-```
 
-- [Learn more about resource quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/)
-
-### 4. Understand ConfigMaps
-ConfigMaps store configuration data for applications.
-
-#### Example:
-**Create a ConfigMap:**
-```bash
-kubectl create configmap app-config --from-literal=APP_ENV=production --from-literal=APP_DEBUG=false
-```
-
-**Consume ConfigMap in a Pod:**
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: configmap-demo
-spec:
-  containers:
-  - name: app-container
-    image: busybox
-    env:
-    - name: APP_ENV
-      valueFrom:
-        configMapKeyRef:
-          name: app-config
-          key: APP_ENV
-    - name: APP_DEBUG
-      valueFrom:
-        configMapKeyRef:
-          name: app-config
-          key: APP_DEBUG
-```
-```bash
-kubectl apply -f pod.yaml
-```
-
-- [Learn more about ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)
-
-### 5. Define Resource Requirements
-Setting resource requests and limits ensures efficient resource usage.
-
-- Refer to **Section 3: Requests and Limits** for examples.
-
-### 6. Create and Consume Secrets
-Secrets store sensitive data like passwords, tokens, and keys.
-
-#### Example:
-**Create a Secret:**
-```bash
-kubectl create secret generic db-credentials --from-literal=username=admin --from-literal=password=secret123
-```
-
-**Consume Secret in a Pod:**
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: secret-demo
-spec:
-  containers:
-  - name: app-container
-    image: busybox
-    env:
-    - name: DB_USERNAME
-      valueFrom:
-        secretKeyRef:
-          name: db-credentials
-          key: username
-    - name: DB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: db-credentials
-          key: password
-```
-```bash
-kubectl apply -f pod.yaml
-```
-
-- [Learn more about Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
-
-### 7. Understand ServiceAccounts
-ServiceAccounts provide identity for processes running in Pods.
-
-#### Example:
-**Create a ServiceAccount:**
-```bash
-kubectl create serviceaccount my-serviceaccount
-```
-
-**Use a ServiceAccount in a Pod:**
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: sa-demo
-spec:
-  serviceAccountName: my-serviceaccount
-  containers:
-  - name: app-container
-    image: busybox
-```
-```bash
-kubectl apply -f pod.yaml
-```
-
-- [Learn more about ServiceAccounts](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
-
-### 8. Understand Application Security (SecurityContexts, Capabilities, etc.)
-SecurityContexts define security settings for Pods and containers.
-
-#### Example:
-**Set SecurityContext for a Pod:**
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: security-demo
-spec:
-  securityContext:
-    runAsUser: 1000
-    runAsGroup: 3000
-    fsGroup: 2000
-  containers:
-  - name: app-container
-    image: busybox
-    command: [ "sh", "-c", "echo Hello Kubernetes! && sleep 3600" ]
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop: ["ALL"]
-```
-```bash
-kubectl apply -f securitycontext.yaml
-```
-
-- [Learn more about SecurityContexts](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+👉 [Resource Quotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/)
 
 ---
 
-### Resources to Prepare
+### ⚙️ 4. Understand ConfigMaps
+
+Store app configs outside of code. Pass them into containers as env vars or volumes.
+
+```bash
+kubectl create configmap app-config --from-literal=APP_MODE=production
+```
+
+Inject into Pod:
+
+```yaml
+env:
+- name: APP_MODE
+  valueFrom:
+    configMapKeyRef:
+      name: app-config
+      key: APP_MODE
+```
+
+👉 [ConfigMaps Guide](https://kubernetes.io/docs/concepts/configuration/configmap/)
+
+---
+
+### 🎯 5. Define Resource Requirements
+
+Covered in Section 3 above. Always define `requests` and `limits` to avoid overcommitment and OOM kills.
+
+---
+
+### 🔑 6. Create and Consume Secrets
+
+Manage sensitive info like passwords securely.
+
+```bash
+kubectl create secret generic db-credentials \
+  --from-literal=username=admin \
+  --from-literal=password=secret123
+```
+
+Inject into Pod:
+
+```yaml
+env:
+- name: DB_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: db-credentials
+      key: username
+```
+
+👉 [Secrets Overview](https://kubernetes.io/docs/concepts/configuration/secret/)
+
+---
+
+### 🧾 7. Understand ServiceAccounts
+
+Bind processes in Pods to identities that control what they can access in the API.
+
+```bash
+kubectl create serviceaccount app-bot
+```
+
+```yaml
+spec:
+  serviceAccountName: app-bot
+```
+
+👉 [ServiceAccounts](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+
+---
+
+### 🛡️ 8. Understand Application Security (SecurityContexts, Capabilities)
+
+Use SecurityContexts to enforce non-root containers, drop privileges, and isolate file permissions.
+
+```yaml
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+```
+
+👉 [Security Contexts](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+
+---
+
+### 🧠 Practice Tips
+
+- Set default namespaces to avoid misplacing objects:
+  ```bash
+  kubectl config set-context --current --namespace=my-app
+  ```
+- Always validate YAML before applying it:
+  ```bash
+  kubectl apply -f myfile.yaml --dry-run=client -o yaml
+  ```
+- Explore CRDs and RBAC via `kubectl explain` to understand object structures.
+
+---
+
+### 📚 Additional Study Resources
+
+- [CKAD Curriculum Overview](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/)
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
 - [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [CKAD Exam Tips](https://kubernetes.io/docs/certifications/)
+
+
 
 
 ## Services And Networking (20%)
