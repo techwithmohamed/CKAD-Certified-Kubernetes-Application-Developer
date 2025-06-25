@@ -40,27 +40,29 @@ The [Certified Kubernetes Application Developer (CKAD) certification](https://ww
 | 🔐  [**Application Environment, Configuration, and Security - 25%**](#application-environment-configuration-and-security-25) | - Discover and use resources that extend Kubernetes (CRD, Operators)<br>- Understand authentication, authorization and admission control<br>- Understand requests, limits, quotas<br>- Understand ConfigMaps<br>- Define resource requirements<br>- Create & consume Secrets<br>- Understand ServiceAccounts<br>- Understand Application Security (SecurityContexts, Capabilities, etc.) | 25% |
 | 🌐  [**Services & Networking - 20%**](#services-and-networking-20) | - Demonstrate basic understanding of NetworkPolicies<br>- Provide and troubleshoot access to applications via services<br>- Use Ingress rules to expose applications | 20% |
 
-## Application Design and Build (20%)
 
-The first domain in the CKAD exam is **Application Design and Build**, comprising 20% of the exam. Below are the key topics explained with `kubectl` examples:
+## 📦 Application Design and Build (20%)
 
-### 1. Define, Build, and Modify Container Images
-Building and customizing container images is essential for deploying applications in Kubernetes.
+This domain focuses on your ability to build containers, choose appropriate workloads, and design Pods for real-world scenarios. You’ll need to be comfortable working with multi-container Pods and both persistent and ephemeral volumes.
 
-#### Example:
-**Create a Dockerfile:**
+### 🛠️ 1. Define, Build, and Modify Container Images
+
+Being able to package your application in a container image is fundamental in Kubernetes. You'll often be asked to use a custom Dockerfile or make small changes to existing images.
+
+#### ✅ Real-World Task:
+
+Create a simple NGINX container that serves a custom homepage.
+
 ```Dockerfile
 FROM nginx:alpine
 COPY index.html /usr/share/nginx/html/index.html
 ```
 
-**Build and push the image:**
 ```bash
-docker build -t <your-dockerhub-username>/custom-nginx:latest .
-docker push <your-dockerhub-username>/custom-nginx:latest
+docker build -t your-dockerhub-username/custom-nginx:latest .
+docker push your-dockerhub-username/custom-nginx:latest
 ```
 
-**Deploy the image in Kubernetes:**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -78,43 +80,25 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: <your-dockerhub-username>/custom-nginx:latest
+        image: your-dockerhub-username/custom-nginx:latest
 ```
+
 ```bash
 kubectl apply -f deployment.yaml
 ```
 
-- [Learn more about building images](https://kubernetes.io/docs/concepts/containers/images/)
+👉 [Kubernetes: Container Images](https://kubernetes.io/docs/concepts/containers/images/)
 
-### 2. Choose and Use the Right Workload Resource
-Kubernetes provides various workload resources like Deployment, DaemonSet, and CronJob for different use cases.
+---
 
-#### Example:
-**Deployment:**
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: web-app
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: web
-  template:
-    metadata:
-      labels:
-        app: web
-    spec:
-      containers:
-      - name: web-container
-        image: nginx
-```
-```bash
-kubectl apply -f deployment.yaml
-```
+### 📂 2. Choose and Use the Right Workload Resource
 
-**CronJob:**
+Different workloads solve different problems. Use `Deployment` for scalable apps, `CronJob` for scheduled tasks, and `DaemonSet` when something needs to run on all nodes.
+
+#### ✅ Real-World Task:
+
+Create a `CronJob` to run a backup every night at 2 AM.
+
 ```yaml
 apiVersion: batch/v1
 kind: CronJob
@@ -135,17 +119,23 @@ spec:
             - "echo Backup complete"
           restartPolicy: OnFailure
 ```
+
 ```bash
 kubectl apply -f cronjob.yaml
 ```
 
-- [Learn more about workloads](https://kubernetes.io/docs/concepts/workloads/)
+👉 [Kubernetes: Workloads Overview](https://kubernetes.io/docs/concepts/workloads/)
 
-### 3. Understand Multi-Container Pod Design Patterns
-Multi-container Pods enable closely related containers to work together, using patterns like **sidecar**, **init container**, etc.
+---
 
-#### Example:
-**Sidecar Container Pattern:**
+### 🧱 3. Understand Multi-Container Pod Design Patterns
+
+Sometimes, your Pod needs more than one container—for example, a logging sidecar or an init container that sets up preconditions.
+
+#### ✅ Real-World Task:
+
+Log everything from the main app using a sidecar container.
+
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -166,17 +156,23 @@ spec:
   - name: log-volume
     emptyDir: {}
 ```
+
 ```bash
 kubectl apply -f pod.yaml
 ```
 
-- [Learn more about Pod design patterns](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/)
+👉 [Pod Design Patterns](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/)
 
-### 4. Utilize Persistent and Ephemeral Volumes
-Persistent volumes retain data across Pod restarts, while ephemeral volumes are temporary.
+---
 
-#### Example:
-**Persistent Volume:**
+### 💾 4. Utilize Persistent and Ephemeral Volumes
+
+You’ll be tested on when to use `emptyDir` vs `PersistentVolumeClaim` (PVC) for Pod storage.
+
+#### ✅ Real-World Task:
+
+Attach persistent storage to a web server.
+
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -189,6 +185,7 @@ spec:
     requests:
       storage: 1Gi
 ```
+
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -206,40 +203,15 @@ spec:
     persistentVolumeClaim:
       claimName: pvc-example
 ```
+
 ```bash
 kubectl apply -f pvc.yaml
 kubectl apply -f pod.yaml
 ```
 
-**Ephemeral Volume:**
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pod-with-ephemeral
-spec:
-  containers:
-  - name: app-container
-    image: nginx
-    volumeMounts:
-    - mountPath: /cache
-      name: cache-volume
-  volumes:
-  - name: cache-volume
-    emptyDir: {}
-```
-```bash
-kubectl apply -f pod-ephemeral.yaml
-```
-
-- [Learn more about persistent and ephemeral volumes](https://kubernetes.io/docs/concepts/storage/)
+👉 [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) 👉 [Ephemeral Volumes](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
 
 ---
-
-### Resources to Prepare
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [CKAD Exam Tips](https://kubernetes.io/docs/certifications/)
 
 
 ## Application Environment, Configuration, and Security (25%)
