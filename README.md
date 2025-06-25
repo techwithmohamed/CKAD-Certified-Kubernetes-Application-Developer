@@ -1,6 +1,9 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
+> 🚀 **This is the most complete, hands-on CKAD 2025 guide**, updated for Kubernetes v1.33. It includes real CLI examples, YAMLs, practice tips, and strategic advice. Ideal for DevOps engineers aiming to pass CKAD confidently.  
+> 🧪 All examples tested on live clusters and crafted from real scenarios.
+
 # ☸️  Certified Kubernetes Application Developer (CKAD) Exam Guide - V1.33 (2025)
 
 <p align="center">
@@ -856,8 +859,6 @@ kubectl debug node/<node-name> --image=busybox
 - [Troubleshooting Practices](https://kubernetes.io/docs/tasks/debug/)
 
 
-
-
 ## CKAD Exam Practice Labs
 
 The best way to prepare is to practice a lot! The setups below will provide you with a Kubernetes cluster where you can perform all the required practice. The CKAD exam expects you to solve problems on a live cluster.
@@ -868,6 +869,182 @@ The best way to prepare is to practice a lot! The setups below will provide you 
 
 1. [**Killercoda**](https://killercoda.com): An online interactive platform to practice Kubernetes and other DevOps tools in a realistic environment.
 2. [**Minikube**](https://minikube.sigs.k8s.io): A tool that lets you run a Kubernetes cluster locally, ideal for individual practice on your local machine.
+
+
+## 🧠 CKAD Strategy & Time Management (2025 Edition)
+
+The CKAD exam is hands-on and time-bound — success depends on both your Kubernetes skills and your test-taking strategy. Use the tips below to boost efficiency and accuracy during the exam.
+
+### ⏱️ 1. Prioritize High-Weight Questions
+
+Not every task is worth the same. Start with the **highest scoring questions first** to maximize your points early on.
+
+- ✅ Skim through all questions before starting
+- ✅ Tackle the 20–25% weighted tasks early
+- ✅ Skip harder ones and return if time allows
+
+---
+
+### ⚙️ 2. Scaffold YAML Fast with `--dry-run=client`
+
+Typing YAML from scratch wastes time. Generate templates using:
+
+```bash
+kubectl create deployment nginx --image=nginx --dry-run=client -o yaml > nginx-deploy.yaml
+```
+
+- Edit in `vim` or `nano`
+- Modify as needed and apply:
+
+```bash
+kubectl apply -f nginx-deploy.yaml
+```
+
+---
+
+### 📄 3. Always Review Before You Submit
+
+A running Pod is worth points — a failed one is not.
+
+Checklist before moving on:
+
+```bash
+kubectl get pods
+kubectl describe pod <pod-name>
+kubectl get events
+```
+
+- ✅ Confirm namespace
+- ✅ Ensure correct cluster context
+- ✅ Validate resource status
+
+---
+
+### 🧭 Pro Time Management Tips
+
+- ⌨️ Use alias:
+
+```bash
+alias k=kubectl
+```
+
+- 🗂️ Set default namespace:
+
+```bash
+kubectl config set-context --current --namespace=my-namespace
+```
+
+- 📝 Leave 15 minutes at the end to review or retry skipped questions
+
+---
+
+💡 This section reflects **real strategies** used by 2025 CKAD candidates and shared on forums like Reddit, Slack, and KodeKloud.
+
+## 🔍 Application Observability and Maintenance (15%)
+
+This section makes up **15% of the CKAD exam** and focuses on monitoring, logging, probing, and debugging Kubernetes applications. These skills are crucial to ensure application reliability and performance in production environments.
+
+---
+
+### 🧭 1. Recognize API Deprecations
+
+Kubernetes APIs are versioned and can be deprecated. You must identify and upgrade deprecated APIs in manifests and clusters.
+
+#### 🧪 Example: Detect and Convert Deprecated Resources
+
+```bash
+kubectl convert -f deployment-v1beta1.yaml --output-version=apps/v1
+kubectl get events --all-namespaces | grep -i deprecated
+```
+
+👉 [K8s API Deprecation Policy](https://kubernetes.io/docs/reference/using-api/deprecation-policy/)
+
+---
+
+### ❤️ 2. Use Liveness and Readiness Probes
+
+Probes help Kubernetes detect if your application is healthy and ready to serve traffic.
+
+#### 💡 Example: Add Liveness and Readiness Probes
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+```
+
+```bash
+kubectl describe pod <pod-name>
+```
+
+👉 [Probe Configuration Guide](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+
+---
+
+### 📊 3. Monitor Resources with Built-in CLI Tools
+
+Monitoring is essential for performance tuning and alerting.
+
+#### 🛠️ Example: Use kubectl for Insights
+
+```bash
+kubectl top nodes
+kubectl top pods
+kubectl describe pod <pod-name>
+kubectl get events --all-namespaces
+```
+
+👉 [Monitoring Tools Overview](https://kubernetes.io/docs/tasks/debug/debug-cluster/)
+
+---
+
+### 📄 4. Access and Stream Container Logs
+
+Logs help you investigate application behavior and issues.
+
+#### 📘 Examples:
+
+```bash
+kubectl logs <pod-name>
+kubectl logs -f <pod-name>
+kubectl logs <pod-name> -c <container-name>
+```
+
+👉 [Kubernetes Logging Basics](https://kubernetes.io/docs/concepts/cluster-administration/logging/)
+
+---
+
+### 🧰 5. Perform Interactive Debugging
+
+You may need to explore Pods or Nodes during troubleshooting.
+
+#### 🔍 Examples:
+
+```bash
+kubectl exec -it <pod-name> -- /bin/sh
+kubectl get pod <pod-name> -o yaml
+kubectl debug node/<node-name> --image=busybox
+```
+
+👉 [Debugging Guide](https://kubernetes.io/docs/tasks/debug/)
+
+---
+
+### 📚 Resources
+
+- [CKAD Curriculum](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/)
+- [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+- [Observability Docs](https://kubernetes.io/docs/concepts/)
+- [Troubleshooting Practices](https://kubernetes.io/docs/tasks/debug/)
 
 
 ## Additional Resources
