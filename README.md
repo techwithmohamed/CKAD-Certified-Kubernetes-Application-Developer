@@ -4,7 +4,7 @@
 # ☸️  Certified Kubernetes Application Developer (CKAD) Exam Guide - V1.33 (2025)
 
 <p align="center">
-  <img src="assets/ckad.png" alt="CKAD EXAM 2025">
+  <img src="ckad.png" alt="CKAD EXAM 2025">
 </p>
 
 > This guide is part of our blog [How to Pass Certified Kubernetes Application Developer (CKAD) 2025 ](https://techwithmohamed.com/ckad-exam-study-guide/).
