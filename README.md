@@ -30,16 +30,15 @@ The [Certified Kubernetes Application Developer (CKAD) certification](https://ww
 > ✅ Tip: Always verify version and exam updates via the [official CKAD page](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/).
 
 
-## CKAD Exam Syllabus (Updated Kubernetes 1.33)
+## 📘 CKAD Exam Syllabus (Kubernetes v1.33 – Updated June 2025)
 
-| **Topic**                                 | **Concepts**                                                                                                                                                       | **Weightage** |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| [**Application Design and Build - 20%**](#application-design-and-build-20)          | 1. Define, build, and modify container images<br>2. Understand Jobs and CronJobs<br>3. Understand multi-container Pod design patterns (e.g., sidecar, init, others)<br>4. Utilize persistent and ephemeral volumes | 20%          |
-| [**Application Environment, Configuration, and Security - 25%**](#application-environment-configuration-and-security-25) | 1. Discover and use resources that extend Kubernetes (CRD)<br>2. Understand authentication, authorization, and admission control<br>3. Understand and define resource requirements, limits, and quotas<br>4. Understand ConfigMaps<br>5. Create & consume Secrets<br>6. Understand ServiceAccounts<br>7. Understand SecurityContexts | 25%          |
-| [**Services & Networking - 20%**](#services-and-networking-20)                | 1. Understand API deprecations<br>2. Implement probes and health checks<br>3. Use provided tools to monitor Kubernetes applications<br>4. Utilize container logs<br>5. Debugging in Kubernetes | 20%          |
-| [**Application Deployment - 20%**](#application-deployment-20)              | 1. Use Kubernetes primitives to implement common deployment strategies (e.g., blue/green or canary)<br>2. Understand Deployments and perform rolling updates<br>3. Use Helm package manager to deploy existing packages | 20%          |
-| [**Application Observability and Maintenance - 15%**](#application-observability-and-maintenance-15) | 1. Understand API deprecations<br>2. Implement probes and health checks<br>3. Use provided tools to monitor Kubernetes applications<br>4. Utilize container logs<br>5. Debugging in Kubernetes | 15%          |
-
+| **🧩 Domain** | **📋 Key Concepts** | **🎯 Weight** |
+|--------------|---------------------|---------------|
+| 🛠️ **Application Design and Build** | - Define, build and modify container images<br>- Choose and use the right workload resource (Deployment, DaemonSet, CronJob, etc.)<br>- Understand multi-container Pod design patterns (e.g. sidecar, init and others)<br>- Utilize persistent and ephemeral volumes | 20% |
+| 🚀 **Application Deployment** | - Use Kubernetes primitives to implement common deployment strategies (e.g. blue/green or canary)<br>- Understand Deployments and how to perform rolling updates<br>- Use the Helm package manager to deploy existing packages<br>- Kustomize | 20% |
+| 🔍 **Application Observability and Maintenance** | - Understand API deprecations<br>- Implement probes and health checks<br>- Use built-in CLI tools to monitor Kubernetes applications<br>- Utilize container logs<br>- Debugging in Kubernetes | 15% |
+| 🔐 **Application Environment, Configuration and Security** | - Discover and use resources that extend Kubernetes (CRD, Operators)<br>- Understand authentication, authorization and admission control<br>- Understand requests, limits, quotas<br>- Understand ConfigMaps<br>- Define resource requirements<br>- Create & consume Secrets<br>- Understand ServiceAccounts<br>- Understand Application Security (SecurityContexts, Capabilities, etc.) | 25% |
+| 🌐 **Services and Networking** | - Demonstrate basic understanding of NetworkPolicies<br>- Provide and troubleshoot access to applications via services<br>- Use Ingress rules to expose applications | 20% |
 
 ## Application Design and Build (20%)
 
