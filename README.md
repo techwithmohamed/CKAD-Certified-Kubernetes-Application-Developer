@@ -35,13 +35,13 @@ The [Certified Kubernetes Application Developer (CKAD) certification](https://ww
 | **🧩 Domain** | **📋 Key Concepts** | **🎯 Weight** |
 |--------------|---------------------|---------------|
 | 🛠️[**Application Design and Build - 20%**](#-application-design-and-build-20) | - Define, build and modify container images<br>- Choose and use the right workload resource (Deployment, DaemonSet, CronJob, etc.)<br>- Understand multi-container Pod design patterns (e.g. sidecar, init and others)<br>- Utilize persistent and ephemeral volumes | 20% |
-| 🚀 [**Application Deployment - 20%**](#application-deployment-20) | - Use Kubernetes primitives to implement common deployment strategies (e.g. blue/green or canary)<br>- Understand Deployments and how to perform rolling updates<br>- Use the Helm package manager to deploy existing packages<br>- Kustomize | 20% |
-| 🔍 [**Application Observability and Maintenance - 15%**](#application-observability-and-maintenance-15) | - Understand API deprecations<br>- Implement probes and health checks<br>- Use built-in CLI tools to monitor Kubernetes applications<br>- Utilize container logs<br>- Debugging in Kubernetes | 15% |
+| 🚀 [**Application Deployment - 20%**](#-application-deployment-20) | - Use Kubernetes primitives to implement common deployment strategies (e.g. blue/green or canary)<br>- Understand Deployments and how to perform rolling updates<br>- Use the Helm package manager to deploy existing packages<br>- Kustomize | 20% |
+| 🔍 [**Application Observability and Maintenance - 15%**](#-application-observability-and-maintenance-15) | - Understand API deprecations<br>- Implement probes and health checks<br>- Use built-in CLI tools to monitor Kubernetes applications<br>- Utilize container logs<br>- Debugging in Kubernetes | 15% |
 | 🔐  [**Application Environment, Configuration, and Security - 25%**](#-application-environment-configuration-and-security-25) | - Discover and use resources that extend Kubernetes (CRD, Operators)<br>- Understand authentication, authorization and admission control<br>- Understand requests, limits, quotas<br>- Understand ConfigMaps<br>- Define resource requirements<br>- Create & consume Secrets<br>- Understand ServiceAccounts<br>- Understand Application Security (SecurityContexts, Capabilities, etc.) | 25% |
-| 🌐  [**Services & Networking - 20%**](#services-and-networking-20) | - Demonstrate basic understanding of NetworkPolicies<br>- Provide and troubleshoot access to applications via services<br>- Use Ingress rules to expose applications | 20% |
+| 🌐  [**Services & Networking - 20%**](#-services-and-networking-20) | - Demonstrate basic understanding of NetworkPolicies<br>- Provide and troubleshoot access to applications via services<br>- Use Ingress rules to expose applications | 20% |
 
 
-## 📦 Application Design and Build (20%)
+## 🛠️ Application Design and Build (20%)
 
 This domain focuses on your ability to build containers, choose appropriate workloads, and design Pods for real-world scenarios. You’ll need to be comfortable working with multi-container Pods and both persistent and ephemeral volumes.
 
@@ -562,23 +562,28 @@ curl -H "Host: example.com" <ingress-ip>
 - [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 - [CKAD Exam Tips](https://kubernetes.io/docs/certifications/)
 
+## 🚀 Application Deployment (20%)
 
-## Application Deployment (20%)
+This domain makes up **20% of the CKAD 2025 exam** and evaluates your ability to roll out, update, and manage applications using Kubernetes-native methods as well as popular tooling like **Helm** and **Kustomize**.
 
-This domain constitutes 20% of the CKAD Exam. Below are the key topics explained with `kubectl` examples and tools like Helm and Kustomize.
+---
 
-### 1. Use Kubernetes Primitives to Implement Common Deployment Strategies (e.g., Blue/Green or Canary)
-Kubernetes provides mechanisms to implement deployment strategies such as blue/green and canary deployments.
+### 🔁 1. Blue/Green and Canary Deployments
 
-#### Blue/Green Deployment Example:
-Create two Deployments (blue and green) and switch traffic using a Service:
+Kubernetes doesn't provide built-in blue/green or canary strategies, but you can implement them using **labels, selectors, and Services**.
+
+#### ✅ Blue/Green Deployment
+
+Create separate deployments and toggle traffic with the Service selector:
+
 ```yaml
+# blue-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blue-deployment
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: my-app
@@ -593,13 +598,15 @@ spec:
       - name: app
         image: my-app:blue
 ```
+
 ```yaml
+# green-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: green-deployment
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: my-app
@@ -614,34 +621,38 @@ spec:
       - name: app
         image: my-app:green
 ```
-Switch the Service to point to the green Deployment:
+
 ```yaml
+# switch Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-app-service
+  name: my-app-svc
 spec:
   selector:
     app: my-app
-    version: green
+    version: green  # 🔁 toggle to green
   ports:
-  - protocol: TCP
-    port: 80
+  - port: 80
     targetPort: 8080
 ```
+
 ```bash
 kubectl apply -f blue-deployment.yaml
 kubectl apply -f green-deployment.yaml
 kubectl apply -f service.yaml
 ```
 
-#### Canary Deployment Example:
-Gradually shift traffic to a new version:
+#### ✅ Canary Deployment
+
+Roll out a partial version of the new release:
+
 ```yaml
+# canary-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: canary-deployment
+  name: canary
 spec:
   replicas: 1
   selector:
@@ -658,87 +669,56 @@ spec:
       - name: app
         image: my-app:canary
 ```
+
 ```bash
 kubectl apply -f canary-deployment.yaml
-kubectl scale deployment canary-deployment --replicas=3
+kubectl scale deployment canary --replicas=3
 ```
 
-- [Learn more about Deployment Strategies](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+👉 [Learn more](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 
-### 2. Understand Deployments and How to Perform Rolling Updates
-Deployments manage updates to applications while ensuring zero downtime.
+---
 
-#### Example:
-**Create a Deployment:**
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rolling-update-demo
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: demo
-  template:
-    metadata:
-      labels:
-        app: demo
-    spec:
-      containers:
-      - name: app
-        image: my-app:v1
-```
+### 🔄 2. Rolling Updates and Rollbacks
+
+Ensure **zero downtime** and maintain control over application versioning.
+
 ```bash
-kubectl apply -f deployment.yaml
+kubectl create deployment demo --image=my-app:v1
+kubectl set image deployment/demo app=my-app:v2
+kubectl rollout status deployment/demo
+kubectl rollout undo deployment/demo
 ```
 
-**Update the Deployment with a New Image:**
-```bash
-kubectl set image deployment/rolling-update-demo app=my-app:v2
-```
-**Monitor the Update:**
-```bash
-kubectl rollout status deployment/rolling-update-demo
-```
-**Rollback if Necessary:**
-```bash
-kubectl rollout undo deployment/rolling-update-demo
-```
+---
 
-- [Learn more about Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+### 📦 3. Use Helm for Reusable Application Charts
 
-### 3. Use the Helm Package Manager to Deploy Existing Packages
-Helm simplifies application management by using reusable charts.
+Helm lets you install, upgrade, and manage applications with consistent manifests.
 
-#### Example:
-**Install Helm and Deploy a Package:**
 ```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install my-release bitnami/nginx
-```
-**Upgrade a Release:**
-```bash
-helm upgrade my-release bitnami/nginx --set image.tag=latest
-```
-**Uninstall a Release:**
-```bash
-helm uninstall my-release
+helm install nginx-demo bitnami/nginx
+helm upgrade nginx-demo bitnami/nginx --set image.tag=1.25.2
+helm uninstall nginx-demo
 ```
 
-- [Learn more about Helm](https://helm.sh/docs/)
+👉 [Helm Docs](https://helm.sh/docs/)
 
-### 4. Kustomize
-Kustomize allows you to customize Kubernetes manifests without modifying the original files.
+---
 
-#### Example:
-**Create a Base Deployment:**
+### 🧰 4. Use Kustomize to Patch Configs
+
+Kustomize supports reusable and layered manifest configurations.
+
+**Base Deployment:**
+
 ```yaml
 # base/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kustomize-demo
+  name: kustom-demo
 spec:
   replicas: 2
   selector:
@@ -753,29 +733,41 @@ spec:
       - name: app
         image: my-app:v1
 ```
-**Create an Overlay to Patch the Base:**
+
+**Overlay Patch:**
+
 ```yaml
-# overlays/production/patch.yaml
+# overlays/prod/kustomization.yaml
+resources:
+  - ../../base
+patchesStrategicMerge:
+  - patch.yaml
+```
+
+```yaml
+# overlays/prod/patch.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kustomize-demo
+  name: kustom-demo
 spec:
   replicas: 5
 ```
-**Apply Kustomize:**
+
 ```bash
-kubectl apply -k overlays/production/
+kubectl apply -k overlays/prod/
 ```
 
-- [Learn more about Kustomize](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/)
+👉 [Kustomize Docs](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/)
 
 ---
 
-### Resources to Prepare
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
+### 📚 Resources
+
+- [CKAD Curriculum Overview](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/)
 - [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [CKAD Exam Tips](https://kubernetes.io/docs/certifications/)
+- [Helm CLI Reference](https://helm.sh/docs/helm/)
+- Practice with: `kubectl rollout`, `helm install`, `kubectl apply -k`
 
 
 ## Application Observability and Maintenance (15%)
