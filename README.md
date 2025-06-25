@@ -759,136 +759,103 @@ kubectl apply -k overlays/prod/
 - Practice with: `kubectl rollout`, `helm install`, `kubectl apply -k`
 
 
-## Application Observability and Maintenance (15%)
+## 🔍 Application Observability and Maintenance (15%)
 
-This domain constitutes 15% of the CKAD Exam. Below are the key topics explained with `kubectl` examples to enhance your understanding of observability and maintenance.
-
-### 1. Understand API Deprecations
-Kubernetes APIs evolve over time. It's essential to understand deprecated APIs and their replacements.
-
-#### Example:
-**Check for Deprecated APIs in Manifests:**
-```bash
-kubectl convert -f deployment-v1beta1.yaml --output-version=apps/v1
-```
-**Verify Deprecated API Usage in the Cluster:**
-```bash
-kubectl get events --all-namespaces | grep -i deprecated
-```
-
-- [Learn more about API Deprecations](https://kubernetes.io/docs/reference/using-api/deprecation-policy/)
-
-### 2. Implement Probes and Health Checks
-Probes ensure application health by checking the status of Pods.
-
-#### Example:
-**Add Liveness and Readiness Probes:**
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: probe-demo
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: demo
-  template:
-    metadata:
-      labels:
-        app: demo
-    spec:
-      containers:
-      - name: app
-        image: my-app:latest
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-```
-```bash
-kubectl apply -f probe-demo.yaml
-```
-**Check Probe Status:**
-```bash
-kubectl describe pod <pod-name>
-```
-
-- [Learn more about Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
-
-### 3. Use Built-in CLI Tools to Monitor Kubernetes Applications
-Kubernetes offers various tools for monitoring application performance and health.
-
-#### Examples:
-**View Resource Utilization:**
-```bash
-kubectl top nodes
-kubectl top pods
-```
-**Describe Resources:**
-```bash
-kubectl describe pod <pod-name>
-kubectl describe node <node-name>
-```
-**Get Cluster Events:**
-```bash
-kubectl get events --all-namespaces
-```
-
-- [Learn more about Monitoring Tools](https://kubernetes.io/docs/tasks/debug/debug-cluster/)
-
-### 4. Utilize Container Logs
-Logs are critical for diagnosing application issues.
-
-#### Example:
-**View Logs for a Specific Pod:**
-```bash
-kubectl logs <pod-name>
-```
-**Stream Logs:**
-```bash
-kubectl logs -f <pod-name>
-```
-**View Logs for a Specific Container in a Pod:**
-```bash
-kubectl logs <pod-name> -c <container-name>
-```
-
-- [Learn more about Container Logs](https://kubernetes.io/docs/concepts/cluster-administration/logging/)
-
-### 5. Debugging in Kubernetes
-Debugging involves identifying and resolving issues in Pods, Deployments, or the cluster.
-
-#### Example:
-**Get Pod Details:**
-```bash
-kubectl get pod <pod-name> -o yaml
-```
-**Exec into a Pod for Debugging:**
-```bash
-kubectl exec -it <pod-name> -- /bin/bash
-```
-**Debug a Node:**
-```bash
-kubectl debug node/<node-name> --image=busybox
-```
-
-- [Learn more about Debugging](https://kubernetes.io/docs/tasks/debug/)
+This section makes up **15% of the CKAD exam** and focuses on monitoring, logging, probing, and debugging Kubernetes applications. These skills are crucial to ensure application reliability and performance in production environments.
 
 ---
 
-### Resources to Prepare
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
+### 🧭 1. Recognize API Deprecations
+Kubernetes APIs are versioned and can be deprecated. You must identify and upgrade deprecated APIs in manifests and clusters.
+
+#### 🧪 Example: Detect and Convert Deprecated Resources
+```bash
+kubectl convert -f deployment-v1beta1.yaml --output-version=apps/v1
+kubectl get events --all-namespaces | grep -i deprecated
+```
+
+👉 [K8s API Deprecation Policy](https://kubernetes.io/docs/reference/using-api/deprecation-policy/)
+
+---
+
+### ❤️ 2. Use Liveness and Readiness Probes
+Probes help Kubernetes detect if your application is healthy and ready to serve traffic.
+
+#### 💡 Example: Add Liveness and Readiness Probes
+```yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+```
+
+```bash
+kubectl describe pod <pod-name>
+```
+
+👉 [Probe Configuration Guide](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+
+---
+
+### 📊 3. Monitor Resources with Built-in CLI Tools
+Monitoring is essential for performance tuning and alerting.
+
+#### 🛠️ Example: Use kubectl for Insights
+```bash
+kubectl top nodes
+kubectl top pods
+kubectl describe pod <pod-name>
+kubectl get events --all-namespaces
+```
+
+👉 [Monitoring Tools Overview](https://kubernetes.io/docs/tasks/debug/debug-cluster/)
+
+---
+
+### 📄 4. Access and Stream Container Logs
+Logs help you investigate application behavior and issues.
+
+#### 📘 Examples:
+```bash
+kubectl logs <pod-name>
+kubectl logs -f <pod-name>
+kubectl logs <pod-name> -c <container-name>
+```
+
+👉 [Kubernetes Logging Basics](https://kubernetes.io/docs/concepts/cluster-administration/logging/)
+
+---
+
+### 🧰 5. Perform Interactive Debugging
+You may need to explore Pods or Nodes during troubleshooting.
+
+#### 🔍 Examples:
+```bash
+kubectl exec -it <pod-name> -- /bin/sh
+kubectl get pod <pod-name> -o yaml
+kubectl debug node/<node-name> --image=busybox
+```
+
+👉 [Debugging Guide](https://kubernetes.io/docs/tasks/debug/)
+
+---
+
+### 📚 Resources
+
+- [CKAD Curriculum](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/)
 - [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [CKAD Exam Tips](https://kubernetes.io/docs/certifications/)
+- [Observability Docs](https://kubernetes.io/docs/concepts/)
+- [Troubleshooting Practices](https://kubernetes.io/docs/tasks/debug/)
+
+
 
 
 ## CKAD Exam Practice Labs
