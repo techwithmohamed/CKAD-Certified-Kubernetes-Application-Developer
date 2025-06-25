@@ -14,16 +14,20 @@
 
 The [Certified Kubernetes Application Developer (CKAD) certification](https://www.cncf.io/certification/ckad/) exam certifies that candidates can design, build and deploy cloud-native applications for Kubernetes.
 
-## CKAD Exam Details
+## 📋 CKAD Exam Details (Updated June 2025)
 
-| **CKAD Exam Details**                     | **Information**                                                                                     |
-|-------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| **Exam Type**                             | Performance based ( NO MCQ )                                                                                            |
-| **Exam Duration**                         | 2 hours                                                                                            |
-| **Pass Percentage**                       | 66%                                                                                                |
-| **CKAD Exam Kubernetes Version**          | Kubernetes v1.33                                                                                |
-| **CKAD Validity**                         | 2 Years  |
-| **Exam Cost**                            | $445 USD        |
+| **Detail**                      | **Description**                                                                 |
+|-------------------------------|---------------------------------------------------------------------------------|
+| 🧪 **Exam Format**             | Hands-on, performance-based (No MCQs)                                           |
+| ⏱️ **Duration**                | 2 hours                                                                         |
+| 🎯 **Passing Score**           | 66%                                                                             |
+| 📦 **Kubernetes Version**      | [Kubernetes v1.33](https://kubernetes.io/blog/2025/04/23/kubernetes-v1-33-release/)                            |
+| 🗓️ **Certification Validity** | 2 years                                                                         |
+| 💰 **Exam Cost**               | $445 USD                                                                        |
+| 🌐 **Proctoring Platform**     | Remote — PSI Bridge (secure browser required)                                  |
+| 📚 **Open Book Resources**     | [kubernetes.io](https://kubernetes.io), GitHub, Kubernetes blog & subdomains   |
+
+> ✅ Tip: Always verify version and exam updates via the [official CKAD page](https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/).
 
 
 ## CKAD Exam Syllabus (Updated Kubernetes 1.33)
