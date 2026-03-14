@@ -62,6 +62,7 @@ LICENSE
   - [5. Services and Networking (20%)](#5-services-and-networking-20)
 - [Exam Day Strategy](#exam-day-strategy)
 - [Mistakes That Will Fail You](#mistakes-that-will-fail-you)
+  - [Troubleshooting Decision Flowchart](#troubleshooting-decision-flowchart)
 - [Practice Scenarios](#practice-scenarios)
 - [Practice Questions (Mock Exam)](#practice-questions-mock-exam)
 - [Study Resources](#study-resources)
@@ -359,6 +360,15 @@ kubectl get pods -l app=web
 This follows the [official CKAD Curriculum v1.35](https://github.com/cncf/curriculum/blob/master/CKAD_Curriculum_v1.35.pdf). Application Environment, Configuration & Security (25%) and the two 20% domains make up the bulk of the exam. I spent most of my study time on those.
 
 ### CKAD Domain Weight Map
+
+```mermaid
+pie title CKAD Exam Weight Distribution (v1.35)
+    "App Environment & Security (25%)" : 25
+    "Application Design & Build (20%)" : 20
+    "Application Deployment (20%)" : 20
+    "Services & Networking (20%)" : 20
+    "Observability & Maintenance (15%)" : 15
+```
 
 | **Domain** | **Key Concepts** | **Weight** |
 |--------------|---------------------|---------------|
@@ -1685,6 +1695,57 @@ kubernetes.io is open during the exam. Use the search bar, go straight to the pa
 
 If the question says "create a Pod", don't create a Deployment. If it says "in namespace staging", you must create in staging. Read every word.
 
+### Troubleshooting Decision Flowchart
+
+I used this mental model every time something wasn't working. Saved me from going down rabbit holes on the exam:
+
+```mermaid
+flowchart TD
+    START[Something is broken] --> Q1{What's broken?}
+    
+    Q1 -->|Pod| POD[kubectl describe pod]
+    Q1 -->|Service| SVC[kubectl get endpoints]
+    Q1 -->|DNS| DNS_CHECK[nslookup from inside a pod]
+    Q1 -->|NetworkPolicy| NP_CHECK[kubectl get netpol -n namespace]
+    
+    POD --> POD_STATUS{Pod Status?}
+    POD_STATUS -->|Pending| PENDING{Events say what?}
+    PENDING -->|Insufficient CPU/Memory| FIX_RES[Reduce resource requests<br/>or check node capacity]
+    PENDING -->|No matching PV| FIX_PV[Create PV or<br/>fix storageClassName]
+    PENDING -->|Unschedulable| FIX_TAINT[Check taints/tolerations<br/>and node affinity]
+    
+    POD_STATUS -->|ImagePullBackOff| FIX_IMG[Check image name<br/>Check imagePullSecret<br/>Check registry access]
+    
+    POD_STATUS -->|CrashLoopBackOff| CRASH[kubectl logs --previous]
+    CRASH --> FIX_CRASH[Fix command/args<br/>Fix ConfigMap/Secret refs<br/>Fix permissions]
+    
+    POD_STATUS -->|Running but wrong| RUNNING_BAD[kubectl logs + exec into pod]
+    
+    SVC --> SVC_EP{Endpoints empty?}
+    SVC_EP -->|Yes| FIX_SEL[Selector doesn't match<br/>pod labels — fix them]
+    SVC_EP -->|No| SVC_PORT{Port mismatch?}
+    SVC_PORT -->|Yes| FIX_PORT[Fix targetPort<br/>to match container port]
+    SVC_PORT -->|No| CHECK_NP[Check NetworkPolicy]
+    
+    DNS_CHECK --> DNS_STATUS{DNS working?}
+    DNS_STATUS -->|No| CHECK_DNS[Check CoreDNS pods<br/>Check kube-dns service<br/>Check /etc/resolv.conf]
+    DNS_STATUS -->|Yes| CHECK_SVC_NAME[Service name wrong?<br/>Namespace missing?]
+    
+    NP_CHECK --> NP_FIX[Missing DNS egress?<br/>Wrong podSelector?<br/>Wrong port number?]
+
+    style START fill:#ff6b6b,color:#fff
+    style FIX_RES fill:#51cf66,color:#fff
+    style FIX_PV fill:#51cf66,color:#fff
+    style FIX_TAINT fill:#51cf66,color:#fff
+    style FIX_IMG fill:#51cf66,color:#fff
+    style FIX_CRASH fill:#51cf66,color:#fff
+    style FIX_SEL fill:#51cf66,color:#fff
+    style FIX_PORT fill:#51cf66,color:#fff
+    style NP_FIX fill:#51cf66,color:#fff
+```
+
+On the exam, when something isn't working, start at the top of this flow and work down.
+
 ---
 
 ## Practice Scenarios
@@ -2524,18 +2585,138 @@ spec:
 
 </details>
 
+---
+
+### Q16 — CronJob with Failure Handling `[4%]` `[Design & Build]`
+
+**Context:** `kubectl config use-context k8s-cluster2`
+
+**Task:** Create a CronJob named `db-cleanup` in namespace `maintenance` that:
+- Runs every day at 2:00 AM (`0 2 * * *`)
+- Uses image `postgres:16-alpine`
+- Runs the command: `psql -h db-svc -U admin -c "DELETE FROM sessions WHERE expires_at < NOW()"`
+- Keeps only the 3 most recent successful job histories
+- Keeps only 1 failed job history
+- Sets `restartPolicy: OnFailure`
+- Has an `activeDeadlineSeconds` of 120 on the job
+
+<details>
+<summary>Solution</summary>
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-cleanup
+  namespace: maintenance
+spec:
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120
+      template:
+        spec:
+          containers:
+          - name: cleanup
+            image: postgres:16-alpine
+            command:
+            - psql
+            - -h
+            - db-svc
+            - -U
+            - admin
+            - -c
+            - "DELETE FROM sessions WHERE expires_at < NOW()"
+          restartPolicy: OnFailure
+```
+
+```bash
+k apply -f cronjob.yaml
+k get cronjob -n maintenance
+k describe cronjob db-cleanup -n maintenance
+```
+
+</details>
+
+---
+
+### Q17 — SecurityContext + ServiceAccount `[4%]` `[Environment & Security]`
+
+**Context:** `kubectl config use-context k8s-cluster1`
+
+**Task:**
+1. Create a ServiceAccount named `restricted-sa` in namespace `secure`
+2. Create a pod named `hardened-app` in namespace `secure` using image `nginx:alpine` with the following security requirements:
+   - Runs as user ID 1000 and group ID 3000
+   - Uses the `restricted-sa` ServiceAccount
+   - Drops ALL Linux capabilities
+   - Sets the root filesystem to read-only
+   - Does not allow privilege escalation
+   - Mounts an `emptyDir` volume at `/tmp` so nginx can write temp files
+
+<details>
+<summary>Solution</summary>
+
+```bash
+k create namespace secure --dry-run=client -o yaml | k apply -f -
+k create serviceaccount restricted-sa -n secure
+```
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hardened-app
+  namespace: secure
+spec:
+  serviceAccountName: restricted-sa
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+        - ALL
+    volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+  volumes:
+  - name: tmp
+    emptyDir: {}
+```
+
+```bash
+k apply -f hardened-app.yaml
+k get pod hardened-app -n secure
+k exec hardened-app -n secure -- id
+# uid=1000 gid=3000
+k exec hardened-app -n secure -- touch /test 2>&1
+# touch: /test: Read-only file system
+```
+
+</details>
+
+---
+
 ### Score Card
 
 | **Domain** | **Questions** | **Weight** |
 |---|---|---|
-| 1. Application Design and Build | Q1–Q3, Q14 | 16% |
+| 1. Application Design and Build | Q1–Q3, Q14, Q16 | 20% |
 | 2. Application Deployment | Q4–Q5, Q13 | 10% |
 | 3. Application Observability and Maintenance | Q6–Q7 | 9% |
-| 4. Application Environment, Configuration, and Security | Q8–Q9 | 8% |
+| 4. Application Environment, Configuration, and Security | Q8–Q9, Q17 | 12% |
 | 5. Services and Networking | Q10–Q12, Q15 | 19% |
-| **Total** | **15 questions** | **62%** |
+| **Total** | **17 questions** | **70%** |
 
-> **Target:** Complete all 15 questions in under 2 hours using only kubernetes.io/docs. If you finish in time with 70%+ correct, you're ready. Add the [practice scenarios](#practice-scenarios) for the remaining coverage.
+> **Target:** Complete all 17 questions in under 2 hours using only kubernetes.io/docs. If you finish in time with 70%+ correct, you're ready. Add the [practice scenarios](#practice-scenarios) for the remaining coverage.
 
 ---
 
