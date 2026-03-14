@@ -20,6 +20,19 @@ The [CKAD (Certified Kubernetes Application Developer)](https://www.cncf.io/cert
 
 If this helped you prepare for the CKAD, a star helps other candidates find it.
 
+### Quick Start (< 4 Weeks to Exam)
+
+Short on time? Here's the fast track:
+
+1. **Run the setup script** — `bash scripts/exam-setup.sh` to get aliases, vim config, and tab completion
+2. **Memorize the skeletons** — skim [`skeletons/`](skeletons/) once, then practice writing each from memory
+3. **Do exercises 1, 3, 5, 6, 10** — they cover pods, ConfigMaps, NetworkPolicy, rolling updates, and security (the highest-weighted domains)
+4. **Take the mock exam below** — 17 questions, 70% weight coverage. Time yourself (5–8 min per question)
+5. **Run killer.sh** — do both sessions. Review every wrong answer. Repeat the weak topics
+6. **Read [Exam Day Strategy](#exam-day-strategy) and [Common Mistakes](#mistakes-that-will-fail-you)** the night before
+
+If you score 80%+ on the mock exam **and** 70%+ on killer.sh, you're ready. Book the exam.
+
 ### Repo Structure
 
 ```
@@ -45,6 +58,7 @@ LICENSE
 
 ## Table of Contents
 
+- [Quick Start (< 4 Weeks to Exam)](#quick-start--4-weeks-to-exam)
 - [Exam Details](#exam-details)
   - [How Much Does the CKAD Exam Cost?](#how-much-does-the-ckad-exam-cost)
   - [CKAD vs CKA vs CKS — Which First?](#ckad-vs-cka-vs-cks--which-certification-should-you-get-first)
@@ -115,6 +129,49 @@ Bundle pricing (CKA + CKAD or CKAD + CKS) also knocks 20–30% off.
 | **Typical order** | 1st or 2nd (if you're a dev) | Start here (if you're ops) | 3rd (requires CKA) |
 
 > **Recommendation:** If you build and deploy applications on Kubernetes, CKAD first. If you manage clusters, start with CKA. The ~40% shared content means studying for one makes the other easier. CKS requires an active CKA, so you cannot skip it.
+
+```mermaid
+graph TB
+    subgraph CKAD ["CKAD — Application Developer"]
+        A1[Pods & Workloads]
+        A2[Deployments & Rollouts]
+        A3[ConfigMaps & Secrets]
+        A4[Services & Networking]
+        A5[Helm & Kustomize]
+        A6[Probes & Logging]
+        A7[RBAC for Apps]
+        A8[SecurityContext]
+        A9[Gateway API]
+    end
+
+    subgraph CKA ["CKA — Cluster Admin"]
+        B1[Cluster Install & Upgrade]
+        B2[etcd Backup & Restore]
+        B3[Node Management]
+        B4[Cluster DNS & Networking]
+        B5[Scheduler & Taints]
+        B6[Storage Classes & Provisioners]
+        B7[Cluster RBAC]
+        B8[Troubleshoot Control Plane]
+    end
+
+    subgraph CKS ["CKS — Security Specialist"]
+        C1[Pod Security Standards]
+        C2[Network Policies Advanced]
+        C3[Container Image Scanning]
+        C4[Audit Logging]
+        C5[Falco & Runtime Security]
+        C6[Supply Chain Security]
+        C7[OPA Gatekeeper]
+    end
+
+    CKAD -->|"~40% overlap"| CKA
+    CKA -->|"required"| CKS
+
+    style CKAD fill:#326CE5,color:#fff
+    style CKA fill:#1a73e8,color:#fff
+    style CKS fill:#d32f2f,color:#fff
+```
 
 ---
 
@@ -2047,7 +2104,7 @@ k describe pod health-check | grep -A 5 "Liveness\|Readiness"
 
 Set a timer (5–8 minutes per question), use only kubernetes.io/docs as reference, and work in a real cluster. Try each one before opening the solution.
 
-### Q1 — Pod with Resources and Labels `[3%]` `[Design & Build]`
+### Q1 — Pod with Resources and Labels `[3%]` `[Design & Build]` `Easy`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2086,7 +2143,7 @@ spec:
 
 </details>
 
-### Q2 — CronJob `[4%]` `[Design & Build]`
+### Q2 — CronJob `[4%]` `[Design & Build]` `Easy`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2123,7 +2180,7 @@ spec:
 
 </details>
 
-### Q3 — Multi-Container Pod with Init Container `[5%]` `[Design & Build]`
+### Q3 — Multi-Container Pod with Init Container `[5%]` `[Design & Build]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster2`
 
@@ -2168,7 +2225,7 @@ k exec web-app -n frontend -- curl -s localhost
 
 </details>
 
-### Q4 — Deployment with Rolling Update Strategy `[4%]` `[Deployment]`
+### Q4 — Deployment with Rolling Update Strategy `[4%]` `[Deployment]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2188,7 +2245,7 @@ k rollout undo deployment/frontend -n production
 
 </details>
 
-### Q5 — Helm Install and Upgrade `[3%]` `[Deployment]`
+### Q5 — Helm Install and Upgrade `[3%]` `[Deployment]` `Easy`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2211,7 +2268,7 @@ helm list -n data
 
 </details>
 
-### Q6 — Probes `[4%]` `[Observability]`
+### Q6 — Probes `[4%]` `[Observability]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster2`
 
@@ -2250,7 +2307,7 @@ k describe pod web-server -n monitoring | grep -A 5 "Liveness\|Readiness"
 
 </details>
 
-### Q7 — Troubleshoot CrashLoopBackOff `[5%]` `[Observability]`
+### Q7 — Troubleshoot CrashLoopBackOff `[5%]` `[Observability]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2284,7 +2341,7 @@ k apply -f fix.yaml
 
 </details>
 
-### Q8 — RBAC + ServiceAccount `[4%]` `[Security]`
+### Q8 — RBAC + ServiceAccount `[4%]` `[Security]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2305,7 +2362,7 @@ k auth can-i delete pods --as=system:serviceaccount:monitoring:monitoring-sa -n 
 
 </details>
 
-### Q9 — SecurityContext `[4%]` `[Security]`
+### Q9 — SecurityContext `[4%]` `[Security]` `Easy`
 
 **Context:** `kubectl config use-context k8s-cluster2`
 
@@ -2341,7 +2398,7 @@ spec:
 
 </details>
 
-### Q10 — NetworkPolicy with Ingress and Egress `[5%]` `[Networking]`
+### Q10 — NetworkPolicy with Ingress and Egress `[5%]` `[Networking]` `Hard`
 
 **Context:** `kubectl config use-context k8s-cluster2`
 
@@ -2392,7 +2449,7 @@ spec:
 
 </details>
 
-### Q11 — Service + Endpoints Debugging `[4%]` `[Networking]`
+### Q11 — Service + Endpoints Debugging `[4%]` `[Networking]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2423,7 +2480,7 @@ k get endpoints payment-svc -n finance
 
 </details>
 
-### Q12 — Gateway API HTTPRoute `[5%]` `[Networking]`
+### Q12 — Gateway API HTTPRoute `[5%]` `[Networking]` `Hard`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2465,7 +2522,7 @@ spec:
 
 </details>
 
-### Q13 — Kustomize `[3%]` `[Deployment]`
+### Q13 — Kustomize `[3%]` `[Deployment]` `Easy`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2504,7 +2561,7 @@ kubectl apply -k overlays/prod/       # apply
 
 </details>
 
-### Q14 — PVC + Pod `[4%]` `[Design & Build]`
+### Q14 — PVC + Pod `[4%]` `[Design & Build]` `Easy`
 
 **Context:** `kubectl config use-context k8s-cluster2`
 
@@ -2547,7 +2604,7 @@ spec:
 
 </details>
 
-### Q15 — Ingress Resource `[5%]` `[Networking]`
+### Q15 — Ingress Resource `[5%]` `[Networking]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -2587,7 +2644,7 @@ spec:
 
 ---
 
-### Q16 — CronJob with Failure Handling `[4%]` `[Design & Build]`
+### Q16 — CronJob with Failure Handling `[4%]` `[Design & Build]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster2`
 
@@ -2642,7 +2699,7 @@ k describe cronjob db-cleanup -n maintenance
 
 ---
 
-### Q17 — SecurityContext + ServiceAccount `[4%]` `[Environment & Security]`
+### Q17 — SecurityContext + ServiceAccount `[4%]` `[Environment & Security]` `Medium`
 
 **Context:** `kubectl config use-context k8s-cluster1`
 
@@ -3160,6 +3217,28 @@ spec:
             image: busybox
             command: ["echo", "hello"]
           restartPolicy: OnFailure
+```
+
+</details>
+
+<details>
+<summary>Job</summary>
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: my-job
+spec:
+  backoffLimit: 4
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      containers:
+      - name: job
+        image: busybox
+        command: ["echo", "hello"]
+      restartPolicy: Never
 ```
 
 </details>

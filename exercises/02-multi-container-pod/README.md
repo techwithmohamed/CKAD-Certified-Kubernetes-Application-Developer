@@ -1,5 +1,7 @@
 # Exercise 2 — Multi-Container Pod (Sidecar)
 
+> Related: [Application Design and Build](../../README.md#1-application-design-and-build-20) | [What Changed in v1.35](../../README.md#what-changed-in-v135) | [YAML Skeleton: Pod](../../skeletons/pod.yaml)
+
 Practice the sidecar pattern using shared volumes and the v1.35 native sidecar syntax.
 
 ## Task

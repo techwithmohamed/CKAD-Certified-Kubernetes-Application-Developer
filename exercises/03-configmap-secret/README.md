@@ -1,5 +1,7 @@
 # Exercise 3 — ConfigMap + Secret Injection
 
+> Related: [Environment, Configuration, and Security](../../README.md#4-application-environment-configuration-and-security-25) | [YAML Skeleton: ConfigMap + Secret](../../skeletons/configmap-secret.yaml)
+
 Practice creating ConfigMaps and Secrets and injecting them into pods as env vars and volumes.
 
 ## Task

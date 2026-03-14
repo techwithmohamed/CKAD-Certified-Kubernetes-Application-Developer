@@ -1,5 +1,7 @@
 # Exercise 6 — Deployment + Rolling Update + Rollback
 
+> Related: [Application Deployment](../../README.md#2-application-deployment-20) | [YAML Skeleton: Deployment](../../skeletons/deployment.yaml)
+
 Practice creating deployments with rolling update strategy and performing rollbacks.
 
 ## Task

@@ -1,5 +1,7 @@
 # Exercise 10 — SecurityContext + PVC
 
+> Related: [Environment, Configuration, and Security](../../README.md#4-application-environment-configuration-and-security-25) | [YAML Skeletons: SecurityContext](../../skeletons/securitycontext.yaml) | [PVC](../../skeletons/pvc.yaml)
+
 Practice pod security settings and persistent storage.
 
 ## Task A — SecurityContext

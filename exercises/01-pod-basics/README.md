@@ -1,5 +1,7 @@
 # Exercise 1 — Pod Basics
 
+> Related: [Application Design and Build](../../README.md#1-application-design-and-build-20) | [YAML Skeleton: Pod](../../skeletons/pod.yaml)
+
 Create a pod with resource limits, labels, and verify it's running.
 
 ## Task

@@ -1,5 +1,7 @@
 # Exercise 4 — RBAC (Role + RoleBinding + ServiceAccount)
 
+> Related: [Environment, Configuration, and Security](../../README.md#4-application-environment-configuration-and-security-25) | [YAML Skeleton: RBAC](../../skeletons/rbac.yaml)
+
 Practice creating RBAC rules that restrict what a ServiceAccount can do.
 
 ## Task

@@ -1,5 +1,7 @@
 # Exercise 8 — Probes (Liveness, Readiness, Startup)
 
+> Related: [Observability and Maintenance](../../README.md#3-application-observability-and-maintenance-15)
+
 Practice adding all three probe types to pods.
 
 ## Task

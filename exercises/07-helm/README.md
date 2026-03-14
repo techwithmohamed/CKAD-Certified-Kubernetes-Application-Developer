@@ -1,5 +1,7 @@
 # Exercise 7 — Helm
 
+> Related: [Application Deployment](../../README.md#2-application-deployment-20)
+
 Practice adding repos, installing charts, upgrading releases, and rolling back.
 
 ## Task

@@ -1,5 +1,7 @@
 # Exercise 5 — NetworkPolicy
 
+> Related: [Services and Networking](../../README.md#5-services-and-networking-20) | [YAML Skeleton: NetworkPolicy](../../skeletons/networkpolicy.yaml)
+
 Practice writing NetworkPolicies with ingress and egress rules, including the DNS egress gotcha.
 
 ## Task
