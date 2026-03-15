@@ -1,4 +1,4 @@
-# Exercise 2 — Multi-Container Pod (Sidecar)
+# Exercise 2 — Multi-Container Pod (Sidecar) `Medium`
 
 > Related: [Application Design and Build](../../README.md#1-application-design-and-build-20) | [What Changed in v1.35](../../README.md#what-changed-in-v135) | [YAML Skeleton: Pod](../../skeletons/pod.yaml)
 

@@ -6,6 +6,14 @@
 
 > My CKAD study notes, practice questions, and kubectl cheat sheet. Kubernetes v1.35. I scored 91% — this is everything I used to prepare.
 
+<p align="center">
+  <a href="https://github.com/techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer/stargazers">
+    <img src="https://img.shields.io/github/stars/techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer?style=social" alt="Stars">
+  </a>
+</p>
+
+> **⭐ If this repo helps you pass the CKAD, a star helps other candidates find it.**
+
 # CKAD Certification Guide 2026 — How I Passed with 91%
 
 <p align="center">
@@ -26,30 +34,39 @@ Short on time? Here's the fast track:
 
 1. **Run the setup script** — `bash scripts/exam-setup.sh` to get aliases, vim config, and tab completion
 2. **Memorize the skeletons** — skim [`skeletons/`](skeletons/) once, then practice writing each from memory
-3. **Do exercises 1, 3, 5, 6, 10** — they cover pods, ConfigMaps, NetworkPolicy, rolling updates, and security (the highest-weighted domains)
-4. **Take the mock exam below** — 17 questions, 70% weight coverage. Time yourself (5–8 min per question)
-5. **Run killer.sh** — do both sessions. Review every wrong answer. Repeat the weak topics
-6. **Read [Exam Day Strategy](#exam-day-strategy) and [Common Mistakes](#mistakes-that-will-fail-you)** the night before
+3. **Do exercises 1, 3, 5, 6, 10, 11** — they cover pods, ConfigMaps, NetworkPolicy, rolling updates, security, and StatefulSets (the highest-weighted domains)
+4. **Run the interactive quiz** — `bash scripts/quiz.sh` for timed practice with auto-verification
+5. **Take the mock exam below** — 17 questions, 70% weight coverage. Time yourself (5–8 min per question)
+6. **Run killer.sh** — do both sessions. Review every wrong answer. Repeat the weak topics
+7. **Read [Exam Day Strategy](#exam-day-strategy) and [Common Mistakes](#mistakes-that-will-fail-you)** the night before
 
 If you score 80%+ on the mock exam **and** 70%+ on killer.sh, you're ready. Book the exam.
+
+> **Every exercise includes a `verify.sh` script** — run it after you attempt the exercise to auto-check your work: `bash exercises/01-pod-basics/verify.sh`
 
 ### Repo Structure
 
 ```
 README.md                      # This guide
-exercises/                     # 10 hands-on labs (one per folder)
-  01-pod-basics/
-  02-multi-container-pod/
-  03-configmap-secret/
-  04-rbac/
-  05-networkpolicy/
-  06-rolling-update/
-  07-helm/
-  08-probes/
-  09-ingress-gateway/
-  10-security-pvc/
-skeletons/                     # Bare YAML templates for quick reference
-scripts/exam-setup.sh          # Aliases + vim config (run first thing)
+exercises/                     # 14 hands-on labs (one per folder, each with verify.sh)
+  01-pod-basics/               # Easy
+  02-multi-container-pod/      # Medium
+  03-configmap-secret/         # Medium
+  04-rbac/                     # Medium
+  05-networkpolicy/            # Hard
+  06-rolling-update/           # Medium
+  07-helm/                     # Medium
+  08-probes/                   # Medium
+  09-ingress-gateway/          # Hard
+  10-security-pvc/             # Hard
+  11-statefulset/              # Hard      ← NEW
+  12-daemonset/                # Medium    ← NEW
+  13-init-containers/          # Medium    ← NEW
+  14-in-place-scaling/         # Hard      ← NEW (v1.35 GA feature)
+skeletons/                     # 14 bare YAML templates for quick reference
+scripts/
+  exam-setup.sh                # Aliases + vim config (run first thing)
+  quiz.sh                      # Interactive terminal quiz with auto-verification
 CONTRIBUTING.md
 LICENSE
 ```
@@ -3287,6 +3304,101 @@ spec:
 </details>
 
 <details>
+<summary>StatefulSet + Headless Service</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: myapp
+spec:
+  serviceName: myapp-headless
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-headless
+spec:
+  clusterIP: None
+  selector:
+    app: myapp
+  ports:
+  - port: 80
+    targetPort: 80
+```
+
+</details>
+
+<details>
+<summary>DaemonSet</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: myagent
+spec:
+  selector:
+    matchLabels:
+      app: myagent
+  template:
+    metadata:
+      labels:
+        app: myagent
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+      containers:
+      - name: agent
+        image: fluentd:v1.16-1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - name: host-logs
+          mountPath: /var/log
+          readOnly: true
+      volumes:
+      - name: host-logs
+        hostPath:
+          path: /var/log
+          type: Directory
+```
+
+</details>
+
+<details>
 <summary>SecurityContext</summary>
 
 ```yaml
@@ -3415,7 +3527,13 @@ The stuff I practiced was the stuff that showed up. If something in this guide i
 
 Good luck.
 
-If this guide helped you, star the repo.
+If this guide helped you, star the repo. ⭐
+
+<p align="center">
+  <a href="https://github.com/techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer/stargazers">
+    <img src="https://img.shields.io/github/stars/techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer?style=social" alt="Stars">
+  </a>
+</p>
 
 [techwithmohamed.com](https://techwithmohamed.com/) · [Blog Post](https://techwithmohamed.com/blog/ckad-exam-study-guide/)
 

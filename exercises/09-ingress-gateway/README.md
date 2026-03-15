@@ -1,4 +1,4 @@
-# Exercise 9 — Ingress + Gateway API
+# Exercise 9 — Ingress + Gateway API `Hard`
 
 > Related: [Services and Networking](../../README.md#5-services-and-networking-20) | [YAML Skeletons: Ingress](../../skeletons/ingress.yaml) | [Gateway API](../../skeletons/gateway-api.yaml)
 

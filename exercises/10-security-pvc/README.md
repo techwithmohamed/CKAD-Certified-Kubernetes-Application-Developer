@@ -1,4 +1,4 @@
-# Exercise 10 — SecurityContext + PVC
+# Exercise 10 — SecurityContext + PVC `Hard`
 
 > Related: [Environment, Configuration, and Security](../../README.md#4-application-environment-configuration-and-security-25) | [YAML Skeletons: SecurityContext](../../skeletons/securitycontext.yaml) | [PVC](../../skeletons/pvc.yaml)
 

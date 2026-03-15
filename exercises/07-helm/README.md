@@ -1,4 +1,4 @@
-# Exercise 7 — Helm
+# Exercise 7 — Helm `Medium`
 
 > Related: [Application Deployment](../../README.md#2-application-deployment-20)
 

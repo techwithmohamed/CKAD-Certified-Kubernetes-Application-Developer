@@ -1,4 +1,4 @@
-# Exercise 4 — RBAC (Role + RoleBinding + ServiceAccount)
+# Exercise 4 — RBAC (Role + RoleBinding + ServiceAccount) `Medium`
 
 > Related: [Environment, Configuration, and Security](../../README.md#4-application-environment-configuration-and-security-25) | [YAML Skeleton: RBAC](../../skeletons/rbac.yaml)
 

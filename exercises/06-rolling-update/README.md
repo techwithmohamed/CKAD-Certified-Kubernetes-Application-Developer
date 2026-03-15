@@ -1,4 +1,4 @@
-# Exercise 6 — Deployment + Rolling Update + Rollback
+# Exercise 6 — Deployment + Rolling Update + Rollback `Medium`
 
 > Related: [Application Deployment](../../README.md#2-application-deployment-20) | [YAML Skeleton: Deployment](../../skeletons/deployment.yaml)
 

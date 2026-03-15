@@ -1,4 +1,4 @@
-# Exercise 1 — Pod Basics
+# Exercise 1 — Pod Basics `Easy`
 
 > Related: [Application Design and Build](../../README.md#1-application-design-and-build-20) | [YAML Skeleton: Pod](../../skeletons/pod.yaml)
 
