@@ -1,0 +1,54 @@
+name: Validate YAML & Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate Kubernetes YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install kubeconform
+        run: |
+          curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Validate skeleton YAML files
+        run: |
+          echo "Validating skeletons/"
+          for f in skeletons/*.yaml; do
+            echo "  Checking $f..."
+            kubeconform -strict -summary "$f"
+          done
+
+      - name: Validate exercise YAML (embedded in READMEs)
+        run: |
+          echo "Extracting and validating YAML from exercise READMEs..."
+          for readme in exercises/*/README.md; do
+            echo "  Scanning $readme for YAML blocks..."
+            # Extract yaml blocks and validate individually
+            awk '/^```yaml/{flag=1; next} /^```/{if(flag) {print "---"; flag=0}} flag' "$readme" > /tmp/extracted.yaml
+            if [ -s /tmp/extracted.yaml ]; then
+              kubeconform -summary -ignore-missing-schemas /tmp/extracted.yaml || true
+            fi
+          done
+
+  markdown-lint:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: |
+            README.md
+            exercises/**/*.md
+            CONTRIBUTING.md
+        continue-on-error: true
