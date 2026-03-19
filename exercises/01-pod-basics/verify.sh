@@ -25,7 +25,7 @@ echo "Verifying Exercise 01 — Pod Basics"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Check namespace exists
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Check pod exists and is running

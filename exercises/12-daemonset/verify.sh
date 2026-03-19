@@ -23,11 +23,11 @@ check() {
 echo "Verifying Exercise 12 — DaemonSet"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Check DaemonSet exists
-ds_exists=$(kubectl get daemonset log-collector -n "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ds_exists=$(kubectl get daemonset log-collector -n "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "DaemonSet 'log-collector' exists" "$ds_exists"
 
 # Check desired = available
@@ -36,7 +36,7 @@ available=$(kubectl get daemonset log-collector -n "$NAMESPACE" -o jsonpath='{.s
 check "All desired pods are available ($desired/$available)" "$([ "$desired" = "$available" ] && echo true || echo false)"
 
 # Check node count matches pod count
-node_count=$(kubectl get nodes --no-headers 2>/dev/null | wc -l || echo 0)
+node_count=$(kubectl get nodes --no-headers 2>/dev/null | wc -l | tr -d ' ' || true)
 check "Pod count matches node count ($available nodes)" "$([ "$available" = "$node_count" ] && echo true || echo false)"
 
 # Check host-logs volume mount

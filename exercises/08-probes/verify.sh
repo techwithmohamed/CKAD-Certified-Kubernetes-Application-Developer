@@ -23,10 +23,10 @@ check() {
 echo "Verifying Exercise 08 — Probes"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
-POD_NAME="probe-pod"
+POD_NAME="probe-test"
 pod_phase=$(kubectl get pod "$POD_NAME" -n "$NAMESPACE" -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
 check "Pod '$POD_NAME' is Running" "$([ "$pod_phase" = "Running" ] && echo true || echo false)"
 

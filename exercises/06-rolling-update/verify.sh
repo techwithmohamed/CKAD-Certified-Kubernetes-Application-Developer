@@ -23,11 +23,11 @@ check() {
 echo "Verifying Exercise 06 — Deployment + Rolling Update + Rollback"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Check deployment exists
-deploy_exists=$(kubectl get deployment webapp -n "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+deploy_exists=$(kubectl get deployment webapp -n "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Deployment 'webapp' exists" "$deploy_exists"
 
 # Check replicas
@@ -47,7 +47,7 @@ max_unavail=$(kubectl get deployment webapp -n "$NAMESPACE" -o jsonpath='{.spec.
 check "maxUnavailable is 0" "$([ "$max_unavail" = "0" ] && echo true || echo false)"
 
 # Check rollout history has multiple revisions
-rev_count=$(kubectl rollout history deployment/webapp -n "$NAMESPACE" 2>/dev/null | grep -c "^[0-9]" || echo 0)
+rev_count=$(kubectl rollout history deployment/webapp -n "$NAMESPACE" 2>/dev/null | grep -c "^[0-9]" | tr -d ' ' || true)
 check "Rollout history has revisions" "$([ "$rev_count" -ge 1 ] && echo true || echo false)"
 
 echo ""
