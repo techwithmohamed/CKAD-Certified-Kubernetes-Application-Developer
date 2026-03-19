@@ -30,6 +30,14 @@ Practice using init containers for dependency checking, data seeding, and migrat
 - Init containers have the same volume access as regular containers
 - Use `kubectl describe pod` to see init container status in the Events section
 
+## Gotchas
+
+- **Init containers must exit successfully** — if any init container fails (non-zero exit), the pod restarts and retries from the first init container
+- **Order matters** — init containers run sequentially in the order listed. You can't parallelize them
+- **Init containers don't show up in `kubectl logs <pod>`** — you need `kubectl logs <pod> -c <init-container-name>` to see their output
+- **DNS may not be ready** — if your init container does a DNS lookup (e.g., `nslookup db-svc`), the target service must exist first. The init container blocks until it resolves
+- **Resource limits** — init container resources are considered separately. The effective pod request is the max of init container requests vs sum of regular container requests
+
 ## Verify
 
 ```bash

@@ -17,6 +17,13 @@ Practice creating RBAC rules that restrict what a ServiceAccount can do.
 - Use imperative commands: `kubectl create role`, `kubectl create rolebinding`
 - Use `kubectl auth can-i` with `--as=system:serviceaccount:<ns>:<sa>` to verify
 
+## Gotchas
+
+- **Role vs ClusterRole** — a `Role` is namespaced; a `ClusterRole` is cluster-wide. Using the wrong one means permissions don't apply where you expect
+- **RoleBinding must reference the correct ServiceAccount namespace** — the `subjects[].namespace` field matters. Getting it wrong silently grants nothing
+- **The `--as` flag format** — it's `system:serviceaccount:<namespace>:<name>`, not just the SA name. Missing the prefix returns `forbidden` even with correct bindings
+- **Verbs are case-sensitive** — `Get` won't work, it must be lowercase `get`
+
 ## Verify
 
 ```bash

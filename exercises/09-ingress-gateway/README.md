@@ -23,6 +23,14 @@ Practice creating Ingress resources and Gateway API HTTPRoutes.
 - HTTPRoute uses `parentRefs` to attach to a Gateway
 - Gateway API uses `type: PathPrefix` under `matches`
 
+## Gotchas
+
+- **`pathType` matters in Ingress** — `Prefix` matches `/shop` and `/shop/anything`; `Exact` matches only `/shop`. Using the wrong type breaks routing
+- **Ingress controller must be installed** — the Ingress resource does nothing without a controller (e.g., nginx-ingress). In kind, install it separately
+- **Gateway API CRDs must be installed** — unlike Ingress, Gateway API resources aren't built-in. Install the CRDs first: `kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/latest/download/standard-install.yaml`
+- **`parentRefs` vs `ingressClassName`** — HTTPRoute uses `parentRefs` to attach to a Gateway; Ingress uses `ingressClassName`. Don't mix them up
+- **Backend service port** — must match the service's actual port, not the container port
+
 ## Cleanup
 
 ```bash

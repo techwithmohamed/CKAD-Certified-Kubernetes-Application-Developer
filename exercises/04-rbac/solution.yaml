@@ -1,0 +1,44 @@
+# Exercise 04 — RBAC — Solution
+#
+# All imperative — no YAML needed:
+#
+# kubectl create namespace exercise-04
+# kubectl create serviceaccount app-sa -n exercise-04
+# kubectl create role pod-manager --verb=get,list,watch,create --resource=pods -n exercise-04
+# kubectl create rolebinding app-sa-binding --role=pod-manager --serviceaccount=exercise-04:app-sa -n exercise-04
+#
+# Verify:
+# kubectl auth can-i list pods --as=system:serviceaccount:exercise-04:app-sa -n exercise-04    → yes
+# kubectl auth can-i delete pods --as=system:serviceaccount:exercise-04:app-sa -n exercise-04   → no
+# kubectl auth can-i create pods --as=system:serviceaccount:exercise-04:app-sa -n exercise-04   → yes
+
+# Equivalent YAML (for reference):
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-sa
+  namespace: exercise-04
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-manager
+  namespace: exercise-04
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-sa-binding
+  namespace: exercise-04
+subjects:
+- kind: ServiceAccount
+  name: app-sa
+  namespace: exercise-04
+roleRef:
+  kind: Role
+  name: pod-manager
+  apiGroup: rbac.authorization.k8s.io

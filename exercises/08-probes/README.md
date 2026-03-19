@@ -18,6 +18,14 @@ Practice adding all three probe types to pods.
 - Add probes under `spec.containers[0]`
 - Startup probe prevents liveness from killing slow-starting apps
 
+## Gotchas
+
+- **Liveness vs Readiness confusion** — liveness failure = container restart; readiness failure = removed from service endpoints (no restart)
+- **Missing startup probe on slow apps** — without it, the liveness probe can kill the container before it finishes starting, causing a restart loop
+- **Wrong `initialDelaySeconds`** — set it too low and the probe fires before the app is ready; set it too high and failures take forever to detect
+- **`httpGet` path must return 200-399** — a 404 response is treated as a probe failure
+- **Port mismatch** — the probe port must match what the container actually listens on, not the service port
+
 ## Verify
 
 ```bash

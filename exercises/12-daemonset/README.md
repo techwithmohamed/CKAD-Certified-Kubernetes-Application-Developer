@@ -24,6 +24,14 @@ Practice creating DaemonSets for node-level workloads like logging agents and mo
 - Tolerations allow pods to be scheduled on tainted nodes
 - Use `kubectl get pods -o wide` to see which node each pod runs on
 
+## Gotchas
+
+- **No `replicas` field** — DaemonSets don't have one. Kubernetes runs exactly one pod per matching node automatically
+- **Control-plane nodes are tainted** — pods won't schedule there unless you add a toleration for `node-role.kubernetes.io/control-plane:NoSchedule`
+- **`hostPath` volumes are node-specific** — each pod sees only its own node's files. The path must exist on the node
+- **Updating a DaemonSet** — by default uses `RollingUpdate` strategy. `OnDelete` requires manual pod deletion to trigger updates
+- **Pod count mismatch** — if you see fewer pods than nodes, check for taints or nodeSelector that exclude some nodes
+
 ## Verify
 
 ```bash

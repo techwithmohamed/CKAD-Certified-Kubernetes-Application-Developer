@@ -1,0 +1,61 @@
+# Exercise 09 — Ingress + Gateway API — Solution
+
+# Step 1: Create deployments and services
+# kubectl create namespace exercise-09
+# kubectl create deployment shop --image=nginx -n exercise-09
+# kubectl expose deployment shop --port=80 --name=shop-svc -n exercise-09
+# kubectl create deployment cart --image=nginx -n exercise-09
+# kubectl expose deployment cart --port=80 --name=cart-svc -n exercise-09
+
+# Task A — Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: store-ingress
+  namespace: exercise-09
+spec:
+  rules:
+  - host: store.example.com
+    http:
+      paths:
+      - path: /shop
+        pathType: Prefix
+        backend:
+          service:
+            name: shop-svc
+            port:
+              number: 80
+      - path: /cart
+        pathType: Prefix
+        backend:
+          service:
+            name: cart-svc
+            port:
+              number: 80
+---
+# Task B — Gateway API HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: store-route
+  namespace: exercise-09
+spec:
+  parentRefs:
+  - name: store-gw
+  hostnames:
+  - "store.example.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /shop
+    backendRefs:
+    - name: shop-svc
+      port: 80
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /cart
+    backendRefs:
+    - name: cart-svc
+      port: 80

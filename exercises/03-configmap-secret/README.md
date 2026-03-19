@@ -20,6 +20,13 @@ Practice creating ConfigMaps and Secrets and injecting them into pods as env var
 - Use `envFrom.configMapRef` for bulk env loading
 - Use `volumes[].secret.secretName` for volume mount
 
+## Gotchas
+
+- **Secret values are base64-encoded** — `kubectl create secret generic` handles encoding automatically, but if you write YAML by hand, you must base64-encode the `data:` values (or use `stringData:` instead)
+- **`envFrom` vs `env.valueFrom`** — `envFrom` loads ALL keys; `env.valueFrom` loads one key at a time. Using the wrong one gives unexpected env vars
+- **Volume-mounted Secrets update automatically** (with a delay), but env vars injected from Secrets do NOT update without a pod restart
+- **Forgetting `mountPath`** — the volume mount path must exist in the container or Kubernetes creates it, which can shadow existing directories
+
 ## Verify
 
 ```bash

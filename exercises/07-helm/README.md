@@ -22,6 +22,14 @@ Practice adding repos, installing charts, upgrading releases, and rolling back.
 - `helm upgrade <release> <chart> -n <ns> --set key=value`
 - `helm rollback <release> <revision> -n <ns>`
 
+## Gotchas
+
+- **`helm install` fails if the release already exists** — use `helm upgrade --install` for idempotent installs
+- **`--set` values don't persist across upgrades** unless you pass them again (or use `-f values.yaml`)
+- **Namespace must exist first** — Helm doesn't create the namespace unless you pass `--create-namespace`
+- **Revision numbers** — `helm rollback myrelease 1` goes to revision 1, not "one revision back". Check `helm history` first
+- **`helm uninstall` removes everything** — there's no soft delete. The release history is gone unless you use `--keep-history`
+
 ## Verify
 
 ```bash

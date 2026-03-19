@@ -17,6 +17,13 @@ Create a pod with resource limits, labels, and verify it's running.
 - Use `kubectl run` with `--dry-run=client -o yaml` to generate the scaffold
 - Edit the YAML to add resources before applying
 
+## Gotchas
+
+- **`requests` vs `limits`** — mixing them up is the #1 mistake. Requests = scheduling guarantee, limits = hard ceiling
+- **Forgetting the namespace** — if you create the pod without `-n exercise-01`, it lands in `default` and verify fails
+- **`kubectl run` doesn't set resources** — you must edit the generated YAML to add `resources:` before applying
+- **CPU units** — `100m` = 0.1 CPU. Writing `100` means 100 full cores — your pod will never schedule
+
 ## Verify
 
 ```bash

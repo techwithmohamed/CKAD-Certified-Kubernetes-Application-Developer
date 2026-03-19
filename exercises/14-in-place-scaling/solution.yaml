@@ -1,0 +1,28 @@
+# Exercise 14 — In-Place Pod Vertical Scaling — Solution
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resize-demo
+  namespace: exercise-14
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resizePolicy:
+    - resourceName: cpu
+      restartPolicy: NotRequired
+    - resourceName: memory
+      restartPolicy: RestartContainer
+    resources:
+      requests:
+        cpu: 100m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+# After the pod is running, resize CPU in-place (no restart):
+# kubectl patch pod resize-demo -n exercise-14 --patch '{"spec":{"containers":[{"name":"nginx","resources":{"requests":{"cpu":"200m"},"limits":{"cpu":"400m"}}}]}}'
+#
+# Then resize memory (triggers container restart):
+# kubectl patch pod resize-demo -n exercise-14 --patch '{"spec":{"containers":[{"name":"nginx","resources":{"requests":{"memory":"128Mi"},"limits":{"memory":"256Mi"}}}]}}'

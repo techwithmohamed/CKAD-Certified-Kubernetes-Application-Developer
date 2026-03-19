@@ -27,6 +27,14 @@ Practice creating StatefulSets with stable identities, headless Services, and pe
 - `volumeClaimTemplates` creates a unique PVC per pod (e.g., `data-db-0`, `data-db-1`)
 - Use `kubectl run tmp --image=busybox --rm -it -- nslookup db-0.db-headless.exercise-11` to test DNS
 
+## Gotchas
+
+- **Headless Service is mandatory** — StatefulSet requires `clusterIP: None` on the governing service. Without it, pods don't get stable DNS names
+- **`serviceName` must match** — the StatefulSet's `spec.serviceName` must exactly match the headless Service name, or DNS registration fails
+- **PVCs are NOT deleted** when you delete the StatefulSet — you must delete them manually. This is by design (data safety)
+- **Pods scale in order** — pod-0 must be Running before pod-1 starts. If pod-0 is stuck, the rest won't launch
+- **DNS format** — `<pod-name>.<service-name>.<namespace>.svc.cluster.local` — forgetting any part returns NXDOMAIN
+
 ## Verify
 
 ```bash

@@ -1,0 +1,113 @@
+name: Test Exercises on Kind Cluster
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'exercises/**'
+      - 'skeletons/**'
+      - 'scripts/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'exercises/**'
+      - 'skeletons/**'
+      - 'scripts/**'
+  schedule:
+    # Run monthly to catch breakage from K8s version changes
+    - cron: '0 6 1 * *'
+
+jobs:
+  test-exercises:
+    name: Verify exercises on Kind cluster
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: ckad-test
+          node_image: kindest/node:v1.35.0
+
+      - name: Verify cluster is ready
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          kubectl wait --for=condition=Ready nodes --all --timeout=120s
+
+      - name: Validate skeleton YAML files
+        run: |
+          echo "Validating all skeleton YAML files..."
+          for f in skeletons/*.yaml; do
+            echo "  Applying $f (dry-run)..."
+            kubectl apply -f "$f" --dry-run=server 2>&1 || echo "  ⚠ $f has issues"
+          done
+
+      - name: Test Exercise 01 — Pod Basics
+        run: |
+          kubectl create namespace exercise-01
+          kubectl apply -f exercises/01-pod-basics/solution.yaml
+          kubectl wait --for=condition=Ready pod/web -n exercise-01 --timeout=60s
+          bash exercises/01-pod-basics/verify.sh
+
+      - name: Test Exercise 02 — Multi-Container Pod
+        run: |
+          kubectl create namespace exercise-02
+          # Apply only the first document (classic sidecar)
+          kubectl apply -f - <<'EOF'
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: app-with-sidecar
+            namespace: exercise-02
+          spec:
+            containers:
+            - name: app
+              image: busybox
+              command: ["sh", "-c", "while true; do date >> /var/log/app.log; sleep 5; done"]
+              volumeMounts:
+              - name: logs
+                mountPath: /var/log
+            - name: log-agent
+              image: busybox
+              command: ["sh", "-c", "tail -f /var/log/app.log"]
+              volumeMounts:
+              - name: logs
+                mountPath: /var/log
+            volumes:
+            - name: logs
+              emptyDir: {}
+          EOF
+          kubectl wait --for=condition=Ready pod/app-with-sidecar -n exercise-02 --timeout=60s
+          bash exercises/02-multi-container-pod/verify.sh
+
+      - name: Test Exercise 04 — RBAC
+        run: |
+          kubectl create namespace exercise-04
+          kubectl create serviceaccount app-sa -n exercise-04
+          kubectl create role pod-manager --verb=get,list,watch,create --resource=pods -n exercise-04
+          kubectl create rolebinding app-sa-binding --role=pod-manager --serviceaccount=exercise-04:app-sa -n exercise-04
+          bash exercises/04-rbac/verify.sh
+
+      - name: Test Exercise 06 — Rolling Update
+        run: |
+          kubectl create namespace exercise-06
+          kubectl apply -f exercises/06-rolling-update/solution.yaml
+          kubectl wait --for=condition=Available deployment/webapp -n exercise-06 --timeout=120s
+          bash exercises/06-rolling-update/verify.sh
+
+      - name: Test Exercise 08 — Probes
+        run: |
+          kubectl create namespace exercise-08
+          kubectl apply -f exercises/08-probes/solution.yaml
+          kubectl wait --for=condition=Ready pod/probe-test -n exercise-08 --timeout=60s
+          bash exercises/08-probes/verify.sh
+
+      - name: Cleanup
+        if: always()
+        run: |
+          for ns in exercise-01 exercise-02 exercise-04 exercise-06 exercise-08; do
+            kubectl delete namespace "$ns" --ignore-not-found --force --grace-period=0 &
+          done
+          wait

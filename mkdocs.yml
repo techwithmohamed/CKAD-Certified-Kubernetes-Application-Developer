@@ -1,0 +1,86 @@
+site_name: CKAD Certification Guide 2026
+site_description: "How I passed the CKAD with 91% — study notes, practice exercises, kubectl cheat sheet, and mock exam for Kubernetes v1.35"
+site_url: https://techwithmohamed.github.io/CKAD-Certified-Kubernetes-Application-Developer/
+repo_url: https://github.com/techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer
+repo_name: techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer
+edit_uri: edit/main/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+  logo: ckad.png
+  favicon: ckad.png
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: README.md
+  - Exercises:
+    - "01 — Pod Basics": exercises/01-pod-basics/README.md
+    - "02 — Multi-Container Pod": exercises/02-multi-container-pod/README.md
+    - "03 — ConfigMap + Secret": exercises/03-configmap-secret/README.md
+    - "04 — RBAC": exercises/04-rbac/README.md
+    - "05 — NetworkPolicy": exercises/05-networkpolicy/README.md
+    - "06 — Rolling Update": exercises/06-rolling-update/README.md
+    - "07 — Helm": exercises/07-helm/README.md
+    - "08 — Probes": exercises/08-probes/README.md
+    - "09 — Ingress + Gateway API": exercises/09-ingress-gateway/README.md
+    - "10 — SecurityContext + PVC": exercises/10-security-pvc/README.md
+    - "11 — StatefulSet": exercises/11-statefulset/README.md
+    - "12 — DaemonSet": exercises/12-daemonset/README.md
+    - "13 — Init Containers": exercises/13-init-containers/README.md
+    - "14 — In-Place Scaling": exercises/14-in-place-scaling/README.md
+  - Changelog: CHANGELOG.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/techwithmohamed
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+
+docs_dir: "."

@@ -1,0 +1,42 @@
+# Exercise 05 — NetworkPolicy — Solution
+#
+# Step 1: Create pods
+# kubectl create namespace exercise-05
+# kubectl run frontend --image=nginx -n exercise-05 -l role=frontend
+# kubectl run api --image=nginx -n exercise-05 -l role=api
+# kubectl run db --image=nginx -n exercise-05 -l role=db
+#
+# Step 2: Apply this NetworkPolicy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-policy
+  namespace: exercise-05
+spec:
+  podSelector:
+    matchLabels:
+      role: api
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          role: frontend
+    ports:
+    - protocol: TCP
+      port: 80
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          role: db
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: UDP
+      port: 53

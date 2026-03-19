@@ -1,0 +1,30 @@
+# Exercise 06 — Deployment + Rolling Update + Rollback — Solution
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+  namespace: exercise-06
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.24
+
+# After applying:
+# kubectl set image deployment/webapp nginx=nginx:1.25 -n exercise-06
+# kubectl rollout status deployment/webapp -n exercise-06
+# kubectl rollout history deployment/webapp -n exercise-06
+# kubectl rollout undo deployment/webapp -n exercise-06

@@ -24,6 +24,14 @@ Practice writing NetworkPolicies with ingress and egress rules, including the DN
 - Always include DNS egress or pod-to-service resolution breaks
 - Use `namespaceSelector: {}` for DNS egress (matches all namespaces)
 
+## Gotchas
+
+- **Forgetting DNS egress** — the classic trap. Without allowing UDP 53, pods can't resolve service names even though the data-plane rules look correct
+- **`policyTypes` field** — if you write `egress` rules but don't include `Egress` in `policyTypes`, the egress rules are silently ignored. Same for `Ingress`
+- **Empty `podSelector: {}`** — this selects ALL pods in the namespace, not none. Use it carefully in the policy target
+- **NetworkPolicies are additive** — there's no "deny" rule. If ANY policy allows the traffic, it's allowed. A default-deny policy is an empty ingress/egress list
+- **CNI must support NetworkPolicy** — kind uses kindnet (no support) by default; use Calico or Cilium to test
+
 ## Verify
 
 ```bash

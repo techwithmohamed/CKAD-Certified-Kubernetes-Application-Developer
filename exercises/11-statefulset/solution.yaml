@@ -1,0 +1,58 @@
+# Exercise 11 — StatefulSet — Solution
+#
+# Step 1: kubectl create namespace exercise-11
+# Step 2: kubectl create secret generic db-secret --from-literal=POSTGRES_PASSWORD=exam123 -n exercise-11
+# Step 3: Apply this manifest
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-headless
+  namespace: exercise-11
+spec:
+  clusterIP: None
+  selector:
+    app: db
+  ports:
+  - port: 5432
+    targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  namespace: exercise-11
+spec:
+  serviceName: db-headless
+  replicas: 3
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi

@@ -19,6 +19,13 @@ Practice the sidecar pattern using shared volumes and the v1.35 native sidecar s
 - Main container command: `sh -c 'while true; do date >> /var/log/app.log; sleep 5; done'`
 - Sidecar command: `sh -c 'tail -f /var/log/app.log'`
 
+## Gotchas
+
+- **Both containers must mount the same volume** — if only the main container writes to `/var/log` but the sidecar doesn't mount it, `tail -f` sees nothing
+- **`emptyDir` is ephemeral** — data is lost when the pod is deleted; don't confuse it with persistent storage
+- **Container names must be unique** within a pod — Kubernetes rejects the spec otherwise
+- **Native sidecar (v1.35)** — uses `initContainers` with `restartPolicy: Always`, not `containers`. The ordering matters: the sidecar starts before the main container
+
 ## Verify
 
 ```bash

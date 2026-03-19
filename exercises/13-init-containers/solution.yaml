@@ -1,0 +1,50 @@
+# Exercise 13 — Init Containers — Solution
+
+# Task A — Dependency Check
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-app
+  namespace: exercise-13
+spec:
+  initContainers:
+  - name: wait-for-db
+    image: busybox
+    command: ["sh", "-c", "until nslookup db-svc.exercise-13.svc.cluster.local; do echo waiting for db-svc; sleep 2; done"]
+  containers:
+  - name: app
+    image: nginx
+---
+# Create the service to unblock the init container:
+# kubectl create service clusterip db-svc --tcp=5432:5432 -n exercise-13
+---
+# Task B — Multi-Init Containers
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-init
+  namespace: exercise-13
+spec:
+  initContainers:
+  - name: init-config
+    image: busybox
+    command: ["sh", "-c", "echo CONFIG_READY=true > /work/config.txt"]
+    volumeMounts:
+    - name: workdir
+      mountPath: /work
+  - name: init-schema
+    image: busybox
+    command: ["sh", "-c", "echo SCHEMA_READY=true >> /work/config.txt"]
+    volumeMounts:
+    - name: workdir
+      mountPath: /work
+  containers:
+  - name: app
+    image: busybox
+    command: ["sh", "-c", "cat /work/config.txt && sleep 3600"]
+    volumeMounts:
+    - name: workdir
+      mountPath: /work
+  volumes:
+  - name: workdir
+    emptyDir: {}

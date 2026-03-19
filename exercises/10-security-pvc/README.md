@@ -15,6 +15,15 @@ Practice pod security settings and persistent storage.
    - Uses a read-only root filesystem
 3. The pod will crash because nginx needs to write to `/var/cache/nginx` — fix it by adding an `emptyDir` volume at that path
 
+## Gotchas
+
+- **Read-only root filesystem breaks most apps** — nginx needs `/var/cache/nginx` and `/var/run` writable. Mount `emptyDir` volumes at those paths
+- **`runAsUser` vs `runAsGroup` vs `fsGroup`** — `runAsUser` sets the UID, `runAsGroup` sets the primary GID, `fsGroup` sets the group owner of mounted volumes. Mixing them up causes permission errors
+- **`drop: ["ALL"]` is strict** — some apps need specific capabilities (e.g., `NET_BIND_SERVICE` for port < 1024). Drop all first, then add back only what's needed
+- **PVC access modes** — `ReadWriteOnce` means one node (not one pod). Multiple pods on the same node can still mount it
+- **PVC binding** — a PVC stays `Pending` until a matching PV exists or a StorageClass provisions one. Check `kubectl get pvc` status
+- **Data persists across pod restarts** — that's the whole point of PVCs. Deleting the pod doesn't delete the PVC
+
 ## Task B — PVC
 
 4. Create a PVC `data-pvc` requesting 256Mi with access mode `ReadWriteOnce`

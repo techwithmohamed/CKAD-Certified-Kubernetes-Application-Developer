@@ -1,0 +1,13 @@
+# Exercise 07 — Helm — Solution
+#
+# This exercise is entirely imperative (no YAML files needed).
+#
+# helm repo add bitnami https://charts.bitnami.com/bitnami
+# helm repo update
+# kubectl create namespace exercise-07
+# helm install myredis bitnami/redis -n exercise-07
+# helm list -n exercise-07
+# helm upgrade myredis bitnami/redis -n exercise-07 --set replica.replicaCount=3
+# helm history myredis -n exercise-07
+# helm rollback myredis 1 -n exercise-07
+# helm uninstall myredis -n exercise-07

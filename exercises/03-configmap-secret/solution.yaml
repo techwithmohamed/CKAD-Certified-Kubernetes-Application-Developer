@@ -1,0 +1,28 @@
+# Exercise 03 — ConfigMap + Secret Injection — Solution
+#
+# Step 1: Create resources imperatively
+# kubectl create namespace exercise-03
+# kubectl create configmap app-config -n exercise-03 --from-literal=DB_HOST=mysql.default.svc --from-literal=LOG_LEVEL=debug
+# kubectl create secret generic db-creds -n exercise-03 --from-literal=username=admin --from-literal=password=ckad2026
+#
+# Step 2: Apply this pod manifest
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-app
+  namespace: exercise-03
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    envFrom:
+    - configMapRef:
+        name: app-config
+    volumeMounts:
+    - name: secret-vol
+      mountPath: /etc/db-creds
+      readOnly: true
+  volumes:
+  - name: secret-vol
+    secret:
+      secretName: db-creds

@@ -28,6 +28,14 @@ Practice resizing CPU and memory of running pods without restarting them — a G
 - Use `kubectl get pod -o jsonpath` to check current resources
 - Check `status.resize` field to see if resize is in progress or completed
 
+## Gotchas
+
+- **Feature gate required** — `InPlacePodVerticalScaling` must be enabled on the cluster (enabled by default in v1.35)
+- **CPU vs Memory behavior** — CPU can resize without restart (`NotRequired`), but memory typically requires `RestartContainer` because the Linux kernel needs to reallocate
+- **`resizePolicy` must be set at pod creation** — you can't add it later. If it's missing, the resize is rejected
+- **Not all runtimes support it** — containerd 1.6+ supports in-place resize; check your runtime version
+- **`status.resize` field** — check this to see if the resize is `InProgress`, `Proposed`, or completed (field disappears when done)
+
 ## Verify
 
 ```bash

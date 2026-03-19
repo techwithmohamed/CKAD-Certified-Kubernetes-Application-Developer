@@ -20,6 +20,13 @@ Practice creating deployments with rolling update strategy and performing rollba
 - Edit to add `strategy.rollingUpdate` before applying
 - Use `kubectl rollout status`, `kubectl rollout history`, `kubectl rollout undo`
 
+## Gotchas
+
+- **`--record` is deprecated** — use `kubectl annotate` with `kubernetes.io/change-cause` to track rollout reasons
+- **`maxUnavailable: 0` + `maxSurge: 0`** is invalid — at least one must be > 0, otherwise the rollout deadlocks
+- **`kubectl rollout undo` goes to the previous revision**, not revision 1. Use `--to-revision=N` to target a specific revision
+- **Image must actually change** — setting the same image doesn't trigger a new rollout. Use `kubectl rollout restart` to force it
+
 ## Verify
 
 ```bash
