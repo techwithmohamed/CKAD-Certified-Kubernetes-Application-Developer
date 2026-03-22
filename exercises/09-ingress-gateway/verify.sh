@@ -23,11 +23,11 @@ check() {
 echo "Verifying Exercise 09 — Ingress + Gateway API"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Task A — Ingress
-ingress_exists=$(kubectl get ingress -n "$NAMESPACE" --no-headers 2>/dev/null | wc -l || echo 0)
+ingress_exists=$(kubectl get ingress -n "$NAMESPACE" --no-headers 2>/dev/null | wc -l | tr -d ' ' || true)
 check "Ingress resource exists" "$([ "$ingress_exists" -ge 1 ] && echo true || echo false)"
 
 # Check Ingress has host-based routing
@@ -35,7 +35,7 @@ ingress_host=$(kubectl get ingress -n "$NAMESPACE" -o jsonpath='{.items[0].spec.
 check "Ingress has host rule" "$([ -n "$ingress_host" ] && echo true || echo false)"
 
 # Task B — Gateway API (may not be available in all clusters)
-httproute_exists=$(kubectl get httproute -n "$NAMESPACE" --no-headers 2>/dev/null | wc -l || echo 0)
+httproute_exists=$(kubectl get httproute -n "$NAMESPACE" --no-headers 2>/dev/null | wc -l | tr -d ' ' || true)
 if [ "$httproute_exists" -ge 1 ]; then
   check "HTTPRoute resource exists" "true"
 else

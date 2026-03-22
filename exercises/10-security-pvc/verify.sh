@@ -23,7 +23,7 @@ check() {
 echo "Verifying Exercise 10 — SecurityContext + PVC"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Task A — SecurityContext
@@ -44,7 +44,7 @@ no_priv=$(kubectl get pod "$POD_A" -n "$NAMESPACE" -o jsonpath='{.spec.container
 check "allowPrivilegeEscalation is false" "$([ "$no_priv" = "false" ] && echo true || echo false)"
 
 # Task B — PVC
-pvc_exists=$(kubectl get pvc data-pvc -n "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+pvc_exists=$(kubectl get pvc data-pvc -n "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "PVC 'data-pvc' exists" "$pvc_exists"
 
 POD_B="writer"

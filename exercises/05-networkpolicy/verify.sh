@@ -23,11 +23,11 @@ check() {
 echo "Verifying Exercise 05 — NetworkPolicy"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Check NetworkPolicy exists
-np_exists=$(kubectl get networkpolicy -n "$NAMESPACE" --no-headers 2>/dev/null | wc -l || echo 0)
+np_exists=$(kubectl get networkpolicy -n "$NAMESPACE" --no-headers 2>/dev/null | wc -l | tr -d ' ' || true)
 check "NetworkPolicy exists" "$([ "$np_exists" -ge 1 ] && echo true || echo false)"
 
 # Check policy types include Ingress
@@ -38,7 +38,7 @@ check "Policy includes Ingress type" "$(echo "$policy_types" | grep -q 'Ingress'
 check "Policy includes Egress type" "$(echo "$policy_types" | grep -q 'Egress' && echo true || echo false)"
 
 # Check DNS egress rule (UDP 53)
-egress_port=$(kubectl get networkpolicy -n "$NAMESPACE" -o json 2>/dev/null | grep -c '"port": 53' || echo 0)
+egress_port=$(kubectl get networkpolicy -n "$NAMESPACE" -o json 2>/dev/null | grep -c '"port": 53' | tr -d ' ' || true)
 check "DNS egress rule (port 53) present" "$([ "$egress_port" -ge 1 ] && echo true || echo false)"
 
 echo ""
