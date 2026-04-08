@@ -23,21 +23,21 @@ check() {
 echo "Verifying Exercise 13 — Init Containers"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Task A — web-app with init container
 pod_phase=$(kubectl get pod web-app -n "$NAMESPACE" -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
 check "Pod 'web-app' is Running" "$([ "$pod_phase" = "Running" ] && echo true || echo false)"
 
-init_count=$(kubectl get pod web-app -n "$NAMESPACE" -o jsonpath='{.spec.initContainers[*].name}' 2>/dev/null | wc -w || echo 0)
+init_count=$(kubectl get pod web-app -n "$NAMESPACE" -o jsonpath='{.spec.initContainers[*].name}' 2>/dev/null | wc -w | tr -d ' ' || true)
 check "web-app has init container" "$([ "$init_count" -ge 1 ] && echo true || echo false)"
 
 # Task B — multi-init
 pod_b_phase=$(kubectl get pod multi-init -n "$NAMESPACE" -o jsonpath='{.status.phase}' 2>/dev/null || echo "")
 check "Pod 'multi-init' is Running" "$([ "$pod_b_phase" = "Running" ] && echo true || echo false)"
 
-init_b_count=$(kubectl get pod multi-init -n "$NAMESPACE" -o jsonpath='{.spec.initContainers[*].name}' 2>/dev/null | wc -w || echo 0)
+init_b_count=$(kubectl get pod multi-init -n "$NAMESPACE" -o jsonpath='{.spec.initContainers[*].name}' 2>/dev/null | wc -w | tr -d ' ' || true)
 check "multi-init has 2 init containers" "$([ "$init_b_count" -eq 2 ] && echo true || echo false)"
 
 # Check logs contain both config values

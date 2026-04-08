@@ -28,15 +28,15 @@ helm_exists=$(command -v helm &>/dev/null && echo true || echo false)
 check "Helm CLI is installed" "$helm_exists"
 
 # Check bitnami repo
-repo_exists=$(helm repo list 2>/dev/null | grep -c bitnami || echo 0)
+repo_exists=$(helm repo list 2>/dev/null | grep -c bitnami | tr -d ' ' || true)
 check "Bitnami repo added" "$([ "$repo_exists" -ge 1 ] && echo true || echo false)"
 
 # Check release exists
-release_exists=$(helm list -n "$NAMESPACE" 2>/dev/null | grep -c "my-nginx" || echo 0)
-check "Release 'my-nginx' exists" "$([ "$release_exists" -ge 1 ] && echo true || echo false)"
+release_exists=$(helm list -n "$NAMESPACE" 2>/dev/null | grep -c "myredis" | tr -d ' ' || true)
+check "Release 'myredis' exists" "$([ "$release_exists" -ge 1 ] && echo true || echo false)"
 
 # Check release status
-release_status=$(helm status my-nginx -n "$NAMESPACE" 2>/dev/null | grep -c "deployed" || echo 0)
+release_status=$(helm status myredis -n "$NAMESPACE" 2>/dev/null | grep -c "deployed" | tr -d ' ' || true)
 check "Release is deployed" "$([ "$release_status" -ge 1 ] && echo true || echo false)"
 
 echo ""

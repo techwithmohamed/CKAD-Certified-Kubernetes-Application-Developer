@@ -23,26 +23,26 @@ check() {
 echo "Verifying Exercise 04 — RBAC"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+ns_exists=$(kubectl get namespace "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "Namespace '$NAMESPACE' exists" "$ns_exists"
 
 # Check ServiceAccount
-sa_exists=$(kubectl get serviceaccount app-sa -n "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
+sa_exists=$(kubectl get serviceaccount app-sa -n "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
 check "ServiceAccount 'app-sa' exists" "$sa_exists"
 
 # Check Role
-role_exists=$(kubectl get role pod-reader -n "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
-check "Role 'pod-reader' exists" "$role_exists"
+role_exists=$(kubectl get role pod-manager -n "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
+check "Role 'pod-manager' exists" "$role_exists"
 
 # Check RoleBinding
-rb_exists=$(kubectl get rolebinding read-pods -n "$NAMESPACE" --no-headers 2>/dev/null && echo true || echo false)
-check "RoleBinding 'read-pods' exists" "$rb_exists"
+rb_exists=$(kubectl get rolebinding app-sa-binding -n "$NAMESPACE" --no-headers >/dev/null 2>&1 && echo true || echo false)
+check "RoleBinding 'app-sa-binding' exists" "$rb_exists"
 
 # Check permissions
-can_get=$(kubectl auth can-i get pods --as=system:serviceaccount:"$NAMESPACE":app-sa -n "$NAMESPACE" 2>/dev/null || echo "no")
+can_get=$(kubectl auth can-i get pods --as=system:serviceaccount:"$NAMESPACE":app-sa -n "$NAMESPACE" 2>/dev/null || true)
 check "app-sa can get pods" "$([ "$can_get" = "yes" ] && echo true || echo false)"
 
-can_delete=$(kubectl auth can-i delete pods --as=system:serviceaccount:"$NAMESPACE":app-sa -n "$NAMESPACE" 2>/dev/null || echo "yes")
+can_delete=$(kubectl auth can-i delete pods --as=system:serviceaccount:"$NAMESPACE":app-sa -n "$NAMESPACE" 2>/dev/null || true)
 check "app-sa cannot delete pods" "$([ "$can_delete" = "no" ] && echo true || echo false)"
 
 echo ""
