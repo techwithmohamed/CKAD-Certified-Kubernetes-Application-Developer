@@ -75,38 +75,47 @@ LICENSE
 
 ## Table of Contents
 
+### Start Here — Practice Your Skills
 - [Quick Start (< 4 Weeks to Exam)](#quick-start--4-weeks-to-exam)
-- [Exam Details](#exam-details)
-  - [How Much Does the CKAD Exam Cost?](#how-much-does-the-ckad-exam-cost)
-  - [CKAD vs CKA vs CKS — Which First?](#ckad-vs-cka-vs-cks--which-certification-should-you-get-first)
-- [What Changed in v1.35](#what-changed-in-v135)
-- [Before You Book](#before-you-book)
+- [CKAD Exam Details & Quick Facts](#exam-details)
+- [CKAD Syllabus Breakdown (v1.35)](#ckad-syllabus-breakdown-v135)
+- [CKAD Domain Weight Distribution](#ckad-domain-weight-distribution)
+- [Practice Scenarios with Full Solutions](#practice-scenarios-with-full-solutions)
+- [Practice Questions — Full Mock Exam](#practice-questions-mock-exam)
+- [Study Progress Tracker](#study-progress-tracker)
+
+### Exam Preparation Strategy
+- [What Changed in v1.35 for CKAD](#what-changed-in-v135)
+- [Before You Book the CKAD Exam](#before-you-book)
 - [The Exam Environment (PSI Remote Desktop)](#the-exam-environment-psi-remote-desktop)
 - [First 60 Seconds — Aliases, vim, bash](#first-60-seconds--aliases-vim-bash)
+- [Imperative Commands Quick Reference](#imperative-commands-quick-reference)
+- [kubectl Cheat Sheet for CKAD](#kubectl-cheat-sheet-for-ckad)
+- [Exam Day Strategy — Time Allocation](#exam-day-strategy)
+- [Mistakes That Will Fail You on the CKAD](#mistakes-that-will-fail-you)
+- [Troubleshooting Decision Flowchart](#troubleshooting-decision-flowchart)
+- [CKAD Exam Day Checklist](#exam-day-checklist)
+
+### Study Resources & Planning
 - [Docs Pages I Actually Used During the Exam](#docs-pages-i-actually-used-during-the-exam)
-- [kubectl Cheat Sheet](#kubectl-cheat-sheet)
-- [CKAD Syllabus (v1.35)](#ckad-syllabus-v135)
-  - [1. Application Design and Build (20%)](#1-application-design-and-build-20)
-  - [2. Application Deployment (20%)](#2-application-deployment-20)
-  - [3. Application Observability and Maintenance (15%)](#3-application-observability-and-maintenance-15)
-  - [4. Application Environment, Configuration, and Security (25%)](#4-application-environment-configuration-and-security-25)
-  - [5. Services and Networking (20%)](#5-services-and-networking-20)
-- [Exam Day Strategy](#exam-day-strategy)
-- [Mistakes That Will Fail You](#mistakes-that-will-fail-you)
-  - [Troubleshooting Decision Flowchart](#troubleshooting-decision-flowchart)
-- [Practice Scenarios](#practice-scenarios)
-- [Practice Questions (Mock Exam)](#practice-questions-mock-exam)
-- [Study Resources](#study-resources)
-- [killer.sh vs the Real Exam](#killersh-vs-the-real-exam)
-- [Exam Day Checklist](#exam-day-checklist)
-- [Study Progress Tracker](#study-progress-tracker)
-- [YAML Skeletons](#yaml-skeletons)
-- [FAQ](#faq)
+- [Study Resources for CKAD 2026](#study-resources)
+- [CKAD Study Plan (4-5 Weeks)](#ckad-study-plan-4-5-weeks)
+- [killer.sh vs the Real CKAD Exam](#killersh-vs-the-real-exam)
+
+### Exam Details & Reference
+- [CKAD Exam Details — Cost, Duration, Passing Score, Format](#exam-details)
+- [How Much Does the CKAD Exam Cost?](#how-much-does-the-ckad-exam-cost)
+- [CKAD vs CKA vs CKS — Which Certification First?](#ckad-vs-cka-vs-cks--which-certification-should-you-get-first)
+- [CKAD vs CKA vs CKS Scope Architecture Diagram](#ckad-vs-cka-vs-cks-scope-architecture-diagram)
+- [CKAD FAQ — Common Questions](#faq)
+
+### Final Thoughts
+- [YAML Skeletons — Write These from Memory](#yaml-skeletons)
 - [Final Words](#final-words)
 
 ---
 
-## Exam Details
+## CKAD Exam Details — Cost, Duration, Passing Score, Format (March 2026)
 
 | **Detail**                      | **Description**                                                                 |
 |-------------------------------|---------------------------------------------------------------------------------|
@@ -192,7 +201,7 @@ graph TB
 
 ---
 
-## What Changed in v1.35
+## What Changed in v1.35 for CKAD
 
 The CKAD exam runs on Kubernetes v1.35 as of March 2026. Here are the changes relevant to the exam:
 
@@ -215,7 +224,7 @@ Full changelog: [Kubernetes v1.35 CHANGELOG](https://github.com/kubernetes/kuber
 
 ---
 
-## Before You Book
+## Before You Book the CKAD Exam
 
 I booked my exam two weeks before I was ready because Linux Foundation had a 30% off sale. Here's what I'd suggest before registering:
 
@@ -296,6 +305,115 @@ That's it. Don't overthink it. Don't try to set up tmux. Don't customize your ba
 This is also available as a standalone script: [`scripts/exam-setup.sh`](scripts/exam-setup.sh)
 
 I practiced this sequence every morning during my study weeks so I could type it without thinking on exam day.
+
+---
+
+## Imperative Commands Quick Reference
+
+Why imperative? Under exam pressure you need speed. Most CKAD questions can be solved faster with imperative commands than writing YAML from scratch. Use `--dry-run=client -o yaml` to generate scaffolds, then edit if needed.
+
+### Fast Pod Creation (30 seconds vs 3 minutes for YAML)
+
+```bash
+# Basic pod
+k run nginx --image=nginx
+
+# Pod with port
+k run nginx --image=nginx --port=80
+
+# Pod with labels
+k run nginx --image=nginx --labels=app=web,tier=frontend
+
+# Pod with environment variables
+k run nginx --image=nginx --env=LOG_LEVEL=debug --env=APP_ENV=prod
+
+# Pod with command override
+k run nginx --image=nginx -- sh -c "echo 'Hello' && sleep 3600"
+
+# Generate YAML without running
+k run nginx --image=nginx $do > pod.yaml
+```
+
+### Deployment Creation & Management
+
+```bash
+# Basic deployment
+k create deployment webapp --image=nginx
+
+# Deployment with replicas
+k create deployment webapp --image=nginx --replicas=3
+
+# Scale deployment
+k scale deployment webapp --replicas=5
+
+# Update image (rolling update)
+k set image deployment/webapp nginx=nginx:1.27 --record
+
+# Rollout commands
+k rollout status deployment/webapp
+k rollout history deployment/webapp
+k rollout undo deployment/webapp
+k rollout undo deployment/webapp --to-revision=2
+```
+
+### Service Exposure
+
+```bash
+# Expose as ClusterIP (internal only)
+k expose deployment webapp --port=80 --target-port=8080
+
+# Expose as NodePort
+k expose deployment webapp --port=80 --target-port=8080 --type=NodePort
+
+# Expose as LoadBalancer
+k expose deployment webapp --port=80 --target-port=8080 --type=LoadBalancer
+
+# Generate service YAML for editing
+k expose deployment webapp --port=80 $do > svc.yaml
+```
+
+### ConfigMap & Secrets
+
+```bash
+# Create ConfigMap from literals
+k create configmap app-config --from-literal=LOG_LEVEL=debug --from-literal=DB_HOST=postgres
+
+# Create ConfigMap from file
+k create configmap app-config --from-file=config.properties
+
+# Create Secret from literals
+k create secret generic db-secret --from-literal=username=admin --from-literal=password=secret123
+
+# Create Secret from file
+k create secret generic tls-secret --from-file=tls.crt=cert.pem --from-file=tls.key=key.pem
+
+# Generate as YAML
+k create configmap app-config --from-literal=key=value $do > cm.yaml
+```
+
+### RBAC
+
+```bash
+# Create ServiceAccount
+k create sa my-app -n prod
+
+# Create Role
+k create role pod-reader --verb=get,list,watch --resource=pods -n prod
+
+# Create RoleBinding
+k create rolebinding read-pods --role=pod-reader --serviceaccount=prod:my-app -n prod
+
+# Create ClusterRole
+k create clusterrole node-reader --verb=get,list --resource=nodes
+
+# Create ClusterRoleBinding
+k create clusterrolebinding read-nodes --clusterrole=node-reader --serviceaccount=prod:my-app
+
+# Check permissions
+k auth can-i list pods -n prod --as=system:serviceaccount:prod:my-app
+```
+
+> **Exam tip:** Use `$do` to generate YAML, review it, then apply. Never type full manifests from memory under time pressure.
 
 ---
 
@@ -429,11 +547,13 @@ kubectl get pods -l app=web
 
 ---
 
-## CKAD Syllabus (v1.35)
+## CKAD Syllabus Breakdown (v1.35)
+
+## CKAD Domain Weight Distribution
 
 This follows the [official CKAD Curriculum v1.35](https://github.com/cncf/curriculum/blob/master/CKAD_Curriculum_v1.35.pdf). Application Environment, Configuration & Security (25%) and the two 20% domains make up the bulk of the exam. I spent most of my study time on those.
 
-### CKAD Domain Weight Map
+### Domain Weight Map
 
 ```mermaid
 pie title CKAD Exam Weight Distribution (v1.35)
@@ -1648,7 +1768,7 @@ If DNS is broken, check:
 
 ---
 
-## Exam Day Strategy
+## Exam Day Strategy — Time Allocation
 
 You get 2 hours for ~15–20 questions, so roughly 6–8 minutes each. Here's the approach I used:
 
@@ -1684,7 +1804,7 @@ You get 2 hours for ~15–20 questions, so roughly 6–8 minutes each. Here's th
 
 ---
 
-## Mistakes That Will Fail You
+## Mistakes That Will Fail You on the CKAD
 
 These are the recurring mistakes I've seen discussed on Reddit and Slack, plus the ones I made myself. For how to handle time pressure, see [exam day strategy](#exam-day-strategy).
 
@@ -1822,7 +1942,7 @@ On the exam, when something isn't working, start at the top of this flow and wor
 
 ---
 
-## Practice Scenarios
+## Practice Scenarios with Full Solutions
 
 These are based on what I actually practiced. Some are close to what I saw on the exam, some are from killer.sh patterns, some are from killercoda labs. Do them in a real cluster — reading the solution without trying first teaches you nothing. For more questions, see the [practice questions section](#practice-questions-mock-exam).
 
@@ -2794,7 +2914,7 @@ k exec hardened-app -n secure -- touch /test 2>&1
 
 ---
 
-## Study Resources
+## Study Resources for CKAD 2026
 
 ### Free Resources
 
@@ -2827,7 +2947,9 @@ minikube start --kubernetes-version=v1.35.0
 # Use Vagrant or cloud VMs to practice
 ```
 
-### Study Plan (4-5 Weeks)
+---
+
+## CKAD Study Plan (4-5 Weeks)
 
 | **Week** | **Focus** | **Weight** | **What to Do** |
 |---|---|---|---|
@@ -2839,9 +2961,9 @@ minikube start --kubernetes-version=v1.35.0
 
 ---
 
-## killer.sh vs the Real Exam
+## killer.sh vs the Real CKAD Exam
 
-After doing killer.sh twice and then taking the real exam, here's how they compare. For practice resources, see the [study resources section](#study-resources).
+After doing killer.sh twice and then taking the real exam, here's how they compare.
 
 | **Aspect** | **killer.sh** | **Real CKAD Exam** |
 |---|---|---|
@@ -2866,7 +2988,28 @@ From what I've read online, scoring 70%+ on killer.sh is a pretty reliable indic
 
 ---
 
-## Exam Day Checklist
+## Mock Exams — Final Preparation
+
+Two comprehensive practice exams matching real CKAD format:
+
+- [Mock Exam 01](mock-exams/MOCK-EXAM-01.md) — 15 questions, 73% weight, 2 hours (answers in [MOCK-EXAM-01-SOLUTIONS.md](mock-exams/MOCK-EXAM-01-SOLUTIONS.md))
+- [Mock Exam 02](mock-exams/MOCK-EXAM-02.md) — 16 questions, 80% weight, 2 hours (answers in [MOCK-EXAM-02-SOLUTIONS.md](mock-exams/MOCK-EXAM-02-SOLUTIONS.md))
+
+Each exam:
+
+- Covers all domains with realistic weight distribution
+- Requires 5–8 minutes per question (like real exam)
+- Has separate question and solution files (don't look at solutions until done)
+- Focuses on integration across domains, not single-domain skills
+
+**Scoring:** 10+ correct (66%) = pass. 12+ = strong. 15+ = ready.
+
+Study approach: Complete all 14 exercises first, then take both mock exams under timed conditions. Track weak areas and review corresponding exercises before taking the real exam.
+
+---
+
+
+## CKAD Exam Day Checklist
 
 Here's the checklist I used. Covers a week before through exam completion.
 
@@ -3424,7 +3567,7 @@ spec:
 
 ---
 
-## FAQ
+## CKAD FAQ — Common Questions
 
 Questions I kept getting asked after passing.
 
