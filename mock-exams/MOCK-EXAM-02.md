@@ -258,6 +258,34 @@ Create a DaemonSet named `node-monitor` that:
 
 ---
 
+---
+
+## Question 17+ (Bonus Debugging Scenarios) — For Practice Beyond Exam
+
+### Question 17B [Debugging] — Service with Incorrect Label Selector
+
+**Context:** `kubectl config use-context k8s-cluster2`  
+**Namespace:** `prod-svc`
+
+**Task:**  
+Service `my-service` exists but has no endpoints. The backend Pods are labeled `tier=application`, but the Service selector is `tier=backend`. Fix the Service selector without touching the Pods.
+
+Verification: `kubectl get endpoints my-service -n prod-svc` should show Pod IPs
+
+---
+
+### Question 18B [Debugging] — StatefulSet with Broken PVC Template
+
+**Context:** `kubectl config use-context k8s-cluster1`  
+**Namespace:** `data-ops`
+
+**Task:**  
+StatefulSet `data-sync` exists but Pods are stuck in `Pending` state. The `volumeClaimTemplate` requests storage class `expensive` which doesn't exist. Update the StatefulSet to use storage class `standard` (which exists).
+
+Hint: Check `kubectl describe pod` under Events section for PVC pending reason.
+
+---
+
 ## Scoring Sheet
 
 Copy this table and track your score:

@@ -265,6 +265,32 @@ Create a StatefulSet named `db-app` in namespace `advanced` with:
 
 ---
 
+## Question 16+ (Bonus Debugging Scenarios) — For Practice Beyond Exam
+
+### Question 16B [Debugging] — Broken Pod with Image Pull Error
+
+**Context:** `kubectl config use-context k8s-cluster1`  
+**Namespace:** `broken-apps`
+
+**Task:**  
+A Pod named `image-test` in namespace `broken-apps` is stuck in `ImagePullBackOff` state. The Pod spec references image `private-registry/app:v2.0` but you need to use the public image `nginx:1.25` instead.
+
+Troubleshoot and fix without recreating the Pod. Hint: Check pod events with `kubectl describe pod image-test -n broken-apps`
+
+---
+
+### Question 17B [Debugging] — ConfigMap Key Mismatch
+
+**Context:** `kubectl config use-context k8s-cluster2`  
+**Namespace:** `app-errors`
+
+**Task:**  
+Deployment `data-processor` in namespace `app-errors` is running but logs show: `Error: ConfigMap key DATABASE_URL not found`. The ConfigMap `app-config` exists with key `DB_URL` (not `DATABASE_URL`). Fix the Deployment to use the correct key without recreating pods.
+
+Verification: `kubectl logs -n app-errors <pod> | grep success`
+
+---
+
 ## Scoring Sheet
 
 Copy this table and track your score:

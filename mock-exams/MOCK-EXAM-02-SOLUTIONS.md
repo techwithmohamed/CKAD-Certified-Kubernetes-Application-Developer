@@ -1,7 +1,44 @@
 # CKAD Mock Exam 02 — Solutions
 
 **Kubernetes Version:** v1.35  
-**Total Points:** 80%
+**Total Points:** 80%  
+**Difficulty:** Hard (Mix of creation, fixes, and advanced scenarios)
+
+---
+
+## Pro Tips for Exam 02 (Increased Difficulty)
+
+### Advanced Debugging Workflow
+
+For hard questions (marked with 5%):
+1. **Always check Events first** — `kubectl describe pod <name>` then look for `Events:` section
+2. **Status codes matter** — `Pending` = resource not allocated, `CrashLoopBackOff` = application error
+3. **Use jq for complex output** — `kubectl get <resource> -o json | jq `.spec.selector``
+
+### Time Management for Hard Questions
+
+| Status | When to Skip | When to Solve |
+|--------|---|---|
+| > 8 minutes spent | Flag it! | only if 50+ min left |
+| Stuck on debugging | Come back later | might be easy fix |
+| Need 3+ edits | Consider reset | declarative approach faster |
+
+### Solution Strategy: Imperative vs Declarative (HARD questions)
+
+For **MOCK-EXAM-02**, most questions require:
+- **Declarative > Imperative** — Exam tests editing/fixing YAML more than CLI
+- **Default approach**: Write YAML, apply, fix errors iteratively
+- **Fast escape**: If debugging takes >3 min, export current state → edit → reapply
+
+### Common Mistakes (Exam 02 Difficulty)
+
+| Mistake | Why | Prevention |
+|---------|-----|-----------|
+| PVC not bound (Pending) | StorageClass doesn't exist | Check `kubectl get storageclass` first |
+| Service has no endpoints | Pod labels don't match selector | Use `kubectl get pods --show-labels` to verify |
+| StatefulSet pods stuck | volumeClaimTemplate references wrong SC | `kubectl describe pod` → look for PVC error |
+| RBAC violation | Missing verbs in Role | Test with `kubectl auth can-i` before assuming it works |
+| Gateway API (v1.35) misconfig | HTTPRoute not linking to Gateway | Verify parentRef matches Gateway name/namespace |
 
 ---
 
@@ -801,6 +838,142 @@ kubectl get pods -n advanced -o wide
 | 14 | Observability | 4% | Medium | 4-5 min |
 | 15 | Design & Build | 4% | Medium | 4-5 min |
 | 16 | Design & Build | 5% | Hard | 6-8 min |
+
+---
+
+## Bonus: Question 17B — Debugging Service with Wrong Label Selector [Debugging Skill]
+
+### Symptom
+Service exists but has no endpoints:
+```bash
+kubectl get endpoints my-service -n prod-svc
+# Output: <none>  # Should show Pod IPs!
+```
+
+### Root Cause Analysis
+```bash
+# Step 1: Check Service selector
+kubectl get svc my-service -n prod-svc -o yaml | grep -A 3 "selector:"
+# Shows: selector: tier: backend
+
+# Step 2: Check actual Pod labels
+kubectl get pods -n prod-svc --show-labels
+# Shows: tier=application  # Mismatch!
+```
+
+### Solution (Without Touching Pods)
+
+```bash
+# Edit the Service selector
+kubectl patch svc my-service -n prod-svc -p \
+  '{"spec":{"selector":{"tier":"application"}}}'
+
+# Verify endpoints appear
+kubectl get endpoints my-service -n prod-svc
+# Output: <pod-ips> (e.g., 10.0.0.1:80, 10.0.0.2:80)
+```
+
+**Alternative with edit:**
+```bash
+kubectl edit svc my-service -n prod-svc
+# Change: tier: backend → tier: application
+```
+
+### Verification & Learning
+
+```bash
+# Verify connectivity
+kubectl run test-pod --image=busybox --rm -it -- wget -O- http://my-service.prod-svc
+# Should succeed (not 'Connection refused')
+
+# Debug command to remember
+kubectl describe svc my-service -n prod-svc
+# Look for 'Endpoints:' section (should show Pod IPs)
+```
+
+**Key insight**: Service is just a label matcher — if Pod labels don't match selector, no endpoints!
+
+---
+
+## Bonus: Question 18B — Debugging StatefulSet with Broken PVC Template [Debugging Skill]
+
+### Symptom
+Pods in StatefulSet stuck in `Pending` state:
+
+```bash
+kubectl get pods -n data-ops -l app=data-sync
+# Output: data-sync-0   Pending   0/1   ...
+```
+
+### Root Cause Analysis
+
+```bash
+# Step 1: Check why Pending
+kubectl describe pod data-sync-0 -n data-ops
+# Look for Events section:
+# Events:
+#   Type: Warning 
+#   Reason: FailedScheduling
+#   Message: Pod didn't trigger scale-up: no StorageClass "expensive"
+
+# Step 2: Verify storage classes available
+kubectl get storageclass
+# Output: standard, fast  (but NOT "expensive")
+```
+
+### Solution
+
+Get the StatefulSet YAML, edit volumeClaimTemplate, reapply:
+
+```bash
+kubectl get statefulset data-sync -n data-ops -o yaml > data-sync.yaml
+```
+
+Edit `data-sync.yaml`:
+```yaml
+# FROM:
+volumeClaimTemplate:
+  spec:
+    storageClassName: expensive  # ❌ Doesn't exist!
+
+# TO:
+volumeClaimTemplate:
+  spec:
+    storageClassName: standard  # ✅ Exists!
+```
+
+```bash
+kubectl delete statefulset data-sync -n data-ops --cascade=orphan
+# (orphan keeps existing PVCs to preserve data)
+
+kubectl apply -f data-sync.yaml
+# New pods will now use 'standard' StorageClass
+```
+
+### Verification
+
+```bash
+kubectl get pvc -n data-ops
+# Output: data-sync-0  Bound  pvc-xxx  1Gi  standard
+#         data-sync-1  Bound  pvc-yyy  1Gi  standard
+
+kubectl get pods data-sync-0 -n data-ops
+# Status: Running (not Pending!)
+```
+
+**Key insight**: StatefulSets + PVCs are tightly coupled — storage issues cause Pod Pending state, not app issues.
+
+---
+
+## Pro Tip: The Debugging Hierarchy (When to Use What)
+
+1. **Status check** → `kubectl get` (1 sec)
+2. **Event inspection** → `kubectl describe` (5 sec)
+3. **Configuration review** → `kubectl get -o yaml` (20 sec)
+4. **Logs + debugging** → `kubectl logs`, `kubectl exec` (30 sec)
+5. **Infrastructure check** → `kubectl get storageclass`, `kubectl get nodes` (10 sec)
+
+Use this order to find 90% of issues in exam. Don't jump to logs before checking Events!
 
 ---
 

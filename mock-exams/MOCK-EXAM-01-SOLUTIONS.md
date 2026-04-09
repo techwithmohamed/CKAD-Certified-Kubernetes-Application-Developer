@@ -5,9 +5,40 @@
 
 ---
 
+## Pro Tips & Time Savers
+
+### Multiple Solution Approaches
+- **Fast path (Imperative)**: Use `kubectl run`, `kubectl create` for quick creation
+- **Flexible path (Declarative)**: Use YAML files for complex configs, can reuse across environments
+- **Cost**: Declarative takes 2-3 minutes longer but reduces errors on complex Deployments
+
+### Debugging Checklist
+When tasks fail, use this sequence:
+1. `kubectl get <resource> -n <namespace>` — Status check
+2. `kubectl describe pod <name> -n <ns>` — See Events section for root cause
+3. `kubectl logs pod <name> -n <ns>` — Check container logs
+4. `kubectl logs pod <name> -n <ns> --previous` — Check crashed container logs
+5. `kubectl get <resource> -o yaml` — Inspect full spec for typos
+
+### Common Exam Mistakes (Avoid These!)
+- ❌ Forgetting `-n <namespace>` in commands (defaults to `default`)
+- ❌ Typos in label selectors (e.g., `app=web` vs `app: web` in YAML)
+- ❌ Not setting `restartPolicy: Never` for Jobs/CronJobs
+- ❌ Missing `selector` field in Deployment YAML (required in v1, not v1beta1)
+- ❌ Using `docker build` instead of `podman build` (exam uses Podman)
+- ❌ Pod `serviceAccountName` is immutable — must delete & recreate if wrong
+
+### Time Management Tips
+- Flag difficult questions (5+ min) and return later
+- Use `kubectl explain <resource>` to verify schema (faster than docs)
+- Copy working YAML blocks and modify rather than typing from scratch
+- Save common templates as local files for paste-and-edit
+
+---
+
 ## Question 1 — Pod with Resources and Labels [3%]
 
-**Solution:**
+### ✅ Fast Approach (Imperative — 30 seconds)
 
 ```bash
 kubectl run web-pod --image=nginx:1.25 \
@@ -17,13 +48,18 @@ kubectl run web-pod --image=nginx:1.25 \
   -n default
 ```
 
-Or via YAML:
+**Why choose this**: Fastest if you already know all parameters. No YAML editing needed.
+
+### ✅ Flexible Approach (Declarative — 1.5 minutes)
+
+Create `web-pod.yaml`:
 
 ```yaml
 apiVersion: v1
 kind: Pod
 metadata:
   name: web-pod
+  namespace: default
   labels:
     app: web
 spec:
@@ -39,10 +75,15 @@ spec:
         memory: 256Mi
 ```
 
-**Verification:**
+Then apply: `kubectl apply -f web-pod.yaml`
+
+**Why choose this**: If unsure about parameters, YAML is self-documenting. Can also export and reuse.
+
+### 🔍 Verification
+
 ```bash
 kubectl get pod web-pod -o yaml | grep -A 5 "resources\|labels"
-# Should show:
+# Expected output:
 # labels:
 #   app: web
 # resources:
@@ -53,6 +94,27 @@ kubectl get pod web-pod -o yaml | grep -A 5 "resources\|labels"
 #     cpu: 100m
 #     memory: 128Mi
 ```
+
+Or more detailed:
+```bash
+kubectl describe pod web-pod
+# Look for "Limits" and "Requests" sections
+```
+
+### ⚠️ Common Pitfalls & How to Avoid
+
+| Mistake | What Happens | Fix |
+|---------|--------------|-----|
+| Forget `-n default` | Goes to `default` namespace (usually OK) but get habit | Always explicit: `-n default` |
+| Typo in labels `app=web vs app: web` | In YAML only `:` works; CLI uses `=` | CLI: `key=value`, YAML: `key: value` |
+| Set limits lower than requests | Pod creation fails | Always: requests ≤ limits |
+| Image doesn't exist | Pod stuck in `ImagePullBackOff` | Verify image exists in registry first |
+
+### 📝 Exam Notes
+
+- **Score criteria**: Full marks if Pod created with all specs, any approach (imperative/declarative)
+- **Partial credit**: Missing label → -1 point, Resource mismatch → -1 point
+- **Typical time**: 2-3 minutes (including verification)
 
 ---
 
@@ -700,6 +762,105 @@ kubectl get pvc -n advanced
 | 13 | Security | 5% | Hard | 6-8 min |
 | 14 | Observability | 4% | Medium | 4-5 min |
 | 15 | Design & Build | 5% | Hard | 6-8 min |
+
+---
+
+## Bonus: Question 16B — Debugging Pod Image Pull Error [Debugging Skill]
+
+### Problem Diagnosis
+
+When you see `ImagePullBackOff`, the Pod spec has an invalid or inaccessible image. Check events:
+
+```bash
+kubectl describe pod image-test -n broken-apps
+# Look for Events section:
+# - Type: Warning | Reason: Failed | Message: Error response from daemon...
+```
+
+### Solution
+
+**Approach 1: Patch (Fastest — 30 seconds)**
+
+```bash
+kubectl patch pod image-test -n broken-apps -p \
+  '{"spec":{"containers":[{"name":"app","image":"nginx:1.25"}]}}'
+
+kubectl get pod image-test -n broken-apps
+# Status should change: ImagePullBackOff → Running
+```
+
+**Approach 2: Export, Edit, Recreate** (safer for complex changes)
+
+```bash
+kubectl get pod image-test -n broken-apps -o yaml > image-test.yaml
+# Edit: image: private-registry/app:v2.0 → image: nginx:1.25
+kubectl delete pod image-test -n broken-apps
+kubectl apply -f image-test.yaml
+```
+
+### Verification
+
+```bash
+kubectl logs image-test -n broken-apps
+# No "image not found" errors
+```
+
+⚠️ **Common pitfalls**: Misspelled image names, private registry without secrets
+
+---
+
+## Bonus: Question 17B — Debugging ConfigMap Key Mismatch [Debugging Skill]
+
+### Problem Diagnosis
+
+App logs show: `"ConfigMap key DATABASE_URL not found"` → Mismatch between Pod spec and actual ConfigMap keys.
+
+**Step 1: Check actual ConfigMap**
+
+```bash
+kubectl get configmap app-config -n app-errors -o yaml
+# data:
+#   DB_URL: "postgres://..."  # Key exists, not DATABASE_URL!
+```
+
+**Step 2: Find the Deployment using it**
+
+```bash
+kubectl describe deployment data-processor -n app-errors | grep -A 5 "env:\|valueFrom"
+```
+
+### Solution
+
+**Edit Deployment → Fix Key Name**
+
+```bash
+kubectl edit deployment data-processor -n app-errors
+```
+
+Change:
+```yaml
+# FROM:
+env:
+- name: DATABASE_URL
+  valueFrom:
+    configMapKeyRef:
+      key: DATABASE_URL  # ❌ Doesn't exist
+
+# TO:
+env:
+- name: DATABASE_URL
+  valueFrom:
+    configMapKeyRef:
+      key: DB_URL  # ✅ Matches ConfigMap
+```
+
+### Verification
+
+```bash
+kubectl rollout restart deployment/data-processor -n app-errors
+kubectl logs deployment/data-processor -n app-errors
+# Check: No "key not found" errors
+```
 
 ---
 
