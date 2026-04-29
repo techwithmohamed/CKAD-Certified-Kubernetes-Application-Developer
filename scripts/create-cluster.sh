@@ -28,18 +28,25 @@ check_tool() {
     case "$1" in
       kind)
         echo "Install kind: https://kind.sigs.k8s.io/docs/user/quick-start/#installation"
+        echo "  # Linux (x86_64)"
+        echo "  curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64"
+        echo "  chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind"
         echo "  brew install kind          # macOS"
-        echo "  go install sigs.k8s.io/kind@latest  # Go"
+        echo "  choco install kind         # Windows"
         ;;
       minikube)
         echo "Install minikube: https://minikube.sigs.k8s.io/docs/start/"
+        echo "  # Linux (x86_64)"
+        echo "  curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+        echo "  sudo install minikube-linux-amd64 /usr/local/bin/minikube"
         echo "  brew install minikube      # macOS"
         echo "  choco install minikube     # Windows"
         ;;
       k3d)
         echo "Install k3d: https://k3d.io/#installation"
+        echo "  curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash   # Linux/macOS"
         echo "  brew install k3d           # macOS"
-        echo "  curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash"
+        echo "  choco install k3d          # Windows"
         ;;
     esac
     exit 1
@@ -124,7 +131,7 @@ kubectl cluster-info --context "kind-${CLUSTER_NAME}" 2>/dev/null || kubectl clu
 kubectl get nodes
 echo ""
 echo -e "${BOLD}Next steps:${NC}"
-echo "  1. Run exam setup:   bash scripts/exam-setup.sh"
+echo "  1. Run exam setup:   source scripts/exam-setup.sh"
 echo "  2. Start practicing: bash exercises/01-pod-basics/verify.sh"
 echo "  3. Take the quiz:    bash scripts/quiz.sh"
 echo "  4. Mock exam:        bash scripts/mock-exam.sh"

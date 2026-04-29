@@ -32,13 +32,29 @@ If this helped you prepare for the CKAD, a star helps other candidates find it.
 
 Short on time? Here's the fast track:
 
-1. **Run the setup script** — `bash scripts/exam-setup.sh` to get aliases, vim config, and tab completion
+1. **Run the setup script** — `source scripts/exam-setup.sh` to get aliases, vim config, and tab completion
 2. **Memorize the skeletons** — skim [`skeletons/`](skeletons/) once, then practice writing each from memory
 3. **Do exercises 1, 3, 5, 6, 10, 11** — they cover pods, ConfigMaps, NetworkPolicy, rolling updates, security, and StatefulSets (the highest-weighted domains)
 4. **Run the interactive quiz** — `bash scripts/quiz.sh` for timed practice with auto-verification
 5. **Take the mock exam below** — 17 questions, 70% weight coverage. Time yourself (5–8 min per question)
 6. **Run killer.sh** — do both sessions. Review every wrong answer. Repeat the weak topics
 7. **Read [Exam Day Strategy](#exam-day-strategy) and [Common Mistakes](#mistakes-that-will-fail-you)** the night before
+
+If you're on Linux and missing local cluster tools, install them first:
+
+```bash
+# kind (recommended)
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+
+# minikube (alternative)
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+# k3d (alternative)
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+```
 
 If you score 80%+ on the mock exam **and** 70%+ on killer.sh, you're ready. Book the exam.
 
@@ -302,7 +318,7 @@ k get nodes
 
 That's it. Don't overthink it. Don't try to set up tmux. Don't customize your bash prompt. Just these 4 steps, then start solving.
 
-This is also available as a standalone script: [`scripts/exam-setup.sh`](scripts/exam-setup.sh)
+This is also available as a script: [`scripts/exam-setup.sh`](scripts/exam-setup.sh) (run it with `source` so aliases stay available)
 
 I practiced this sequence every morning during my study weeks so I could type it without thinking on exam day.
 

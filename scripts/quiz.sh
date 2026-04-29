@@ -14,6 +14,9 @@
 # Source: https://github.com/techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer
 
 set -euo pipefail
+# Pasted one-liners may use the exam alias `k`; non-interactive shells do not expand aliases by default
+shopt -s expand_aliases
+alias k=kubectl
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -26,6 +29,52 @@ NC='\033[0m'
 HISTORY_FILE="${HOME}/.ckad-quiz-history"
 SPEED_MODE=false
 DOMAIN_FILTER=""
+
+# YAML helpers (heredocs cannot live inside the pipe-delimited QUESTIONS strings)
+apply_quiz_networkpolicy() {
+  kubectl apply -f - <<'EOF'
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: quiz-netpol
+  namespace: quiz
+spec:
+  podSelector:
+    matchLabels:
+      app: quiz-pod
+  policyTypes:
+  - Ingress
+EOF
+}
+
+apply_quiz_pvc() {
+  kubectl apply -f - <<'EOF'
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: quiz-pvc
+  namespace: quiz
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+EOF
+}
+
+# Each QUESTION line is: domain|question|solution|verify
+# Solutions often contain '|' (pipes), so we must NOT use IFS='|' read with only 4 fields.
+# (Question must not include literal '|' characters. Verify is always the last segment after '|'.)
+parse_quiz_line() {
+  local line="$1"
+  Q_PARSED_VERIFY="${line##*|}"
+  local without_verify="${line%|*}"
+  Q_PARSED_DOMAIN="${without_verify%%|*}"
+  local rest="${without_verify#*|}"
+  Q_PARSED_QUESTION="${rest%%|*}"
+  Q_PARSED_SOLUTION="${rest#*|}"
+}
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -50,14 +99,14 @@ QUESTIONS=(
   "security|Create a ServiceAccount named 'quiz-sa' in namespace 'quiz'.|kubectl create serviceaccount quiz-sa -n quiz|kubectl get serviceaccount quiz-sa -n quiz -o jsonpath='{.metadata.name}'"
   "design|Create a Job named 'quiz-job' using image busybox that runs 'echo CKAD' in namespace 'quiz'.|kubectl create job quiz-job --image=busybox -n quiz -- echo CKAD|kubectl get job quiz-job -n quiz -o jsonpath='{.metadata.name}'"
   "design|Create a CronJob named 'quiz-cron' with schedule '*/5 * * * *' using image busybox that runs 'date' in namespace 'quiz'.|kubectl create cronjob quiz-cron --image=busybox --schedule='*/5 * * * *' -n quiz -- date|kubectl get cronjob quiz-cron -n quiz -o jsonpath='{.spec.schedule}'"
-  "security|Create a Role named 'quiz-role' in namespace 'quiz' that allows get,list on pods.|kubectl create role quiz-role --verb=get,list --resource=pods -n quiz|kubectl get role quiz-role -n quiz -o jsonpath='{.metadata.name}'"
+  "security|Create a Role named 'quiz-role' in namespace 'quiz' that allows get,list on pods.|kubectl create role quiz-role --verb=get,list --resource=pods -n quiz|kubectl get role quiz-role -n quiz -o name"
   "deploy|Scale the deployment 'quiz-deploy' to 5 replicas in namespace 'quiz'.|kubectl scale deployment quiz-deploy --replicas=5 -n quiz|kubectl get deployment quiz-deploy -n quiz -o jsonpath='{.spec.replicas}'"
-  "deploy|Set the image of deployment 'quiz-deploy' to nginx:latest in namespace 'quiz'.|kubectl set image deployment/quiz-deploy nginx-alpine=nginx:latest -n quiz || kubectl set image deployment/quiz-deploy nginx=nginx:latest -n quiz|kubectl get deployment quiz-deploy -n quiz -o jsonpath='{.spec.template.spec.containers[0].image}'"
+  "deploy|Set the image of deployment 'quiz-deploy' to nginx:latest in namespace 'quiz'.|kubectl set image deployment/quiz-deploy nginx=nginx:latest -n quiz|kubectl get deployment quiz-deploy -n quiz -o jsonpath='{.spec.template.spec.containers[0].image}'"
   "networking|Create a ClusterIP Service named 'quiz-svc' targeting quiz-deploy on port 80 in namespace 'quiz'.|kubectl expose deployment quiz-deploy --name=quiz-svc --port=80 -n quiz|kubectl get service quiz-svc -n quiz -o jsonpath='{.spec.type}'"
   "security|Create a RoleBinding 'quiz-binding' binding 'quiz-role' to ServiceAccount 'quiz-sa' in namespace 'quiz'.|kubectl create rolebinding quiz-binding --role=quiz-role --serviceaccount=quiz:quiz-sa -n quiz|kubectl get rolebinding quiz-binding -n quiz -o jsonpath='{.metadata.name}'"
   "observe|Get the logs of pod 'quiz-pod' in namespace 'quiz' (just run the command).|kubectl logs quiz-pod -n quiz|kubectl get pod quiz-pod -n quiz -o jsonpath='{.metadata.name}'"
-  "networking|Create a NetworkPolicy 'quiz-netpol' in namespace 'quiz' that denies all ingress to pods labeled app=quiz-pod.|kubectl apply -f - <<'EOF'\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: quiz-netpol\n  namespace: quiz\nspec:\n  podSelector:\n    matchLabels:\n      app: quiz-pod\n  policyTypes:\n  - Ingress\nEOF|kubectl get networkpolicy quiz-netpol -n quiz -o jsonpath='{.metadata.name}'"
-  "design|Create a PVC named 'quiz-pvc' requesting 100Mi with ReadWriteOnce in namespace 'quiz'.|kubectl apply -f - <<'EOF'\napiVersion: v1\nkind: PersistentVolumeClaim\nmetadata:\n  name: quiz-pvc\n  namespace: quiz\nspec:\n  accessModes:\n  - ReadWriteOnce\n  resources:\n    requests:\n      storage: 100Mi\nEOF|kubectl get pvc quiz-pvc -n quiz -o jsonpath='{.metadata.name}'"
+  "networking|Create a NetworkPolicy 'quiz-netpol' in namespace 'quiz' that denies all ingress to pods labeled app=quiz-pod.|apply_quiz_networkpolicy|kubectl get networkpolicy quiz-netpol -n quiz -o jsonpath='{.metadata.name}'"
+  "design|Create a PVC named 'quiz-pvc' requesting 100Mi with ReadWriteOnce in namespace 'quiz'.|apply_quiz_pvc|kubectl get pvc quiz-pvc -n quiz -o jsonpath='{.metadata.name}'"
 )
 
 score=0
@@ -130,6 +179,10 @@ echo -e "${BOLD}║       CKAD Quick Quiz — Practice Mode         ║${NC}"
 echo -e "${BOLD}║  ${#FILTERED_QUESTIONS[@]} questions | ${mode_label} | domain: ${domain_label}    ${NC}"
 echo -e "${BOLD}╚═══════════════════════════════════════════════╝${NC}"
 echo ""
+echo -e "${DIM}This prompt only waits for Enter: it does not read commands from other terminals.${NC}"
+echo -e "${DIM}• Use a second tab: run kubectl there, then return here and press ${BOLD}Enter${DIM} (empty line) to verify.${NC}"
+echo -e "${DIM}• Or paste a single ${BOLD}kubectl ...${DIM} or ${BOLD}k ...${DIM} line at the prompt; it will be run here before verify.${NC}"
+echo ""
 
 # Show recent history if available
 if [ -f "$HISTORY_FILE" ]; then
@@ -141,14 +194,23 @@ if [ -f "$HISTORY_FILE" ]; then
   fi
 fi
 
-# Ensure quiz namespace exists
-kubectl create namespace quiz --dry-run=client -o yaml | kubectl apply -f - 2>/dev/null
+# Ensure quiz namespace exists (do not hide errors: verify needs a working 'quiz' namespace)
+if ! kubectl get namespace quiz &>/dev/null; then
+  if ! kubectl create namespace quiz; then
+    echo -e "${RED}Cannot create namespace 'quiz' — is your cluster reachable and is kubectl configured?${NC}" >&2
+    exit 1
+  fi
+fi
 
 # Shuffle questions
 shuffled=($(shuf -i 0-$((${#FILTERED_QUESTIONS[@]}-1)) -n ${#FILTERED_QUESTIONS[@]} 2>/dev/null || seq 0 $((${#FILTERED_QUESTIONS[@]}-1))))
 
 for idx in "${shuffled[@]}"; do
-  IFS='|' read -r domain question solution verify <<< "${FILTERED_QUESTIONS[$idx]}"
+  parse_quiz_line "${FILTERED_QUESTIONS[$idx]}"
+  domain="$Q_PARSED_DOMAIN"
+  question="$Q_PARSED_QUESTION"
+  solution="$Q_PARSED_SOLUTION"
+  verify="$Q_PARSED_VERIFY"
   total=$((total + 1))
 
   echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -159,12 +221,31 @@ for idx in "${shuffled[@]}"; do
 
   start_time=$(date +%s)
   read -r user_input
+  # Strip Windows CRLF so pasted one-liners match kubectl/k patterns
+  user_input="${user_input//$'\r'/}"
 
   if [ "$user_input" = "skip" ]; then
     echo -e "${RED}Skipped.${NC}"
     echo -e "  Solution: ${GREEN}${solution}${NC}"
     echo ""
     continue
+  fi
+
+  # A plain `read` does NOT run what you type: many users paste the expected kubectl line here.
+  # If it looks like a one-line kubectl/k command, run it in this shell before we verify.
+  if [[ -n "$user_input" ]]; then
+    if [[ "$user_input" =~ ^[[:space:]]*kubectl[[:space:]] ]] || [[ "$user_input" =~ ^[[:space:]]*k[[:space:]]+ ]]; then
+      echo -e "  ${DIM}Running: ${BOLD}${user_input}${NC}"
+      set +e
+      eval "$user_input"
+      user_cmd_ec=$?
+      set -e
+      if [ "$user_cmd_ec" -ne 0 ]; then
+        echo -e "  ${YELLOW}That command exited with status ${user_cmd_ec}.${NC}"
+      fi
+    else
+      echo -e "  ${YELLOW}Not running the line you typed (not kubectl/k). Open another tab to run your commands, or paste a one-line kubectl or k command.${NC}"
+    fi
   fi
 
   elapsed=$(( $(date +%s) - start_time ))
@@ -174,18 +255,22 @@ for idx in "${shuffled[@]}"; do
     echo -e "  Completed in ${elapsed}s"
   fi
 
-  # Verify
-  if eval "$verify" &>/dev/null; then
-    result=$(eval "$verify" 2>/dev/null)
-    if [ -n "$result" ]; then
-      echo -e "  ${GREEN}✓ CORRECT — Resource verified successfully${NC}"
-      score=$((score + 1))
-    else
-      echo -e "  ${RED}✗ NOT FOUND — Resource not created correctly${NC}"
-      echo -e "  Expected solution: ${GREEN}${solution}${NC}"
-    fi
+  # Verify: must succeed with exit 0. Under set -e, use explicit status capture.
+  set +e
+  verify_combined_out=$(eval "$verify" 2>&1)
+  verify_status=$?
+  set -e
+  if [ "$verify_status" -eq 0 ]; then
+    echo -e "  ${GREEN}✓ CORRECT — Resource verified successfully${NC}"
+    score=$((score + 1))
   else
     echo -e "  ${RED}✗ VERIFICATION FAILED${NC}"
+    if [ -n "$verify_combined_out" ]; then
+      echo -e "  ${DIM}From kubectl:${NC}"
+      while IFS= read -r _kl || [ -n "$_kl" ]; do
+        echo -e "  ${DIM}  ${_kl}${NC}"
+      done <<< "$verify_combined_out"
+    fi
     echo -e "  Expected solution: ${GREEN}${solution}${NC}"
   fi
   echo ""

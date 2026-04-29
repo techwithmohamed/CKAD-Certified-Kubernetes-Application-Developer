@@ -2,6 +2,10 @@
 # CKAD Exam Setup — run this in the first 30 seconds
 # Source: https://github.com/techwithmohamed/CKAD-Certified-Kubernetes-Application-Developer
 
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  echo "Tip: run 'source scripts/exam-setup.sh' so aliases and exports persist in your shell."
+fi
+
 # Aliases
 alias k=kubectl
 export do='--dry-run=client -o yaml'
@@ -21,4 +25,9 @@ EOF
 
 # Verify
 echo "--- Setup complete ---"
-k get nodes
+if kubectl get nodes >/dev/null 2>&1; then
+  kubectl get nodes
+else
+  echo "kubectl is configured, but no reachable cluster context is currently set."
+  echo "Create a cluster first (for example: bash scripts/create-cluster.sh)."
+fi
