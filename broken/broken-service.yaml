@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: web  # BROKEN: Pods have app: webapp, not app: web
+  ports:
+    - port: 80
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp  # Deployment uses: app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp  # Pods labeled: app: webapp
+    spec:
+      containers:
+      - name: app
+        image: nginx
+        ports:
+        - containerPort: 8080
+
+---
+# PROBLEM: Service created but shows 0 endpoints
+#
+# SYMPTOMS:
+# $ kubectl get svc myapp-svc
+# NAME        TYPE       CLUSTER-IP   EXTERNAL-IP   PORT(S)
+# myapp-svc   ClusterIP  10.0.0.1     <none>        80/TCP
+# $ kubectl get endpoints myapp-svc
+# NAME        ENDPOINTS   AGE
+# myapp-svc   <none>      1m  <- EMPTY!
+#
+# ROOT CAUSE:
+# Service selector (app: web) doesn't match pod labels (app: webapp)
+#
+# FIX:
+# 1. Check pod labels:
+#    $ kubectl get pod --show-labels
+#    NAME                    LABELS
+#    myapp-xyz...            app=webapp
+# 2. Edit service:
+#    $ kubectl edit svc myapp-svc
+#    Change: selector.app: web  →  selector.app: webapp
+# 3. Verify:
+#    $ kubectl get endpoints myapp-svc
+#    Should now show: 10.0.0.x:8080
+#
+# ALTERNATIVE FIX (recreate):
+#    $ kubectl delete svc myapp-svc
+#    $ kubectl expose deployment myapp --port=80 --target-port=8080 --name=myapp-svc

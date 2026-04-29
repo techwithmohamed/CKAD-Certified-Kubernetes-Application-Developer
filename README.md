@@ -60,6 +60,118 @@ If you score 80%+ on the mock exam **and** 70%+ on killer.sh, you're ready. Book
 
 > **Every exercise includes a `verify.sh` script** — run it after you attempt the exercise to auto-check your work: `bash exercises/01-pod-basics/verify.sh`
 
+---
+
+## 🎯 NEW: Exam-Focused Study Path (Updated 2026)
+
+This repo has been restructured into a **high-performance exam prep system** focused on:
+- **Pattern recognition** (most exam questions follow repeating patterns)
+- **Time pressure training** (timed exercises with scoring)
+- **Debugging skills** (broken scenarios teach you how to think)
+- **Real exam scenarios** (multi-step workflows matching actual exam questions)
+
+### 📚 Repository Structure (Navigation)
+
+```
+├── patterns/                 ← START HERE (6 most-tested patterns)
+│   ├── README.md            (overview of all patterns)
+│   ├── rbac-debug.md        (ServiceAccount → Role → RoleBinding flow)
+│   ├── deployment-fix.md    (debugging CrashLoopBackOff)
+│   ├── networkpolicy-allow-deny.md  (allow/deny traffic rules)
+│   ├── cronjob-create.md    (schedule format & timing)
+│   ├── ingress-debug.md     (service selector → port mapping)
+│   └── service-selector-mismatch.md (0 endpoints diagnosis)
+│
+├── broken/                  ← PRACTICE DEBUGGING (real broken YAML)
+│   ├── README.md            (how to use broken scenarios)
+│   ├── broken-pod.yaml      (image wrong + probe too aggressive)
+│   └── broken-service.yaml  (selector mismatch)
+│
+├── timed/                   ← BUILD SPEED (2/5/10 min tasks)
+│   └── timed-exercises.md   (progressive difficulty, measure yourself)
+│
+├── mock-exam/               ← FULL PRACTICE (15 questions, 2 hours)
+│   └── FULL-MOCK-EXAM.md    (real exam simulation with answers)
+│
+├── multi-step/              ← REAL EXAM FLOW (10-15 min scenarios)
+│   └── multi-step-scenarios.md (deploy + expose + restrict pattern)
+│
+├── rbac/                    ← DEEP DIVE (CKAD's #1 topic)
+│   └── rbac-scenarios.md    (cross-namespace, audit, troubleshooting)
+│
+├── networking/              ← DEBUG LIKE A PRO (most fails here)
+│   └── networking-debug.md  (service broken → ingress 503 → networkpolicy)
+│
+├── basics/                  ← FUNDAMENTALS (avoid rookie mistakes)
+│   ├── COMMON-MISTAKES.md   (20 most-expensive errors)
+│   └── basics-cheatsheet.md (rules you're forgetting)
+│
+├── container/               ← BONUS (5-10% of exam)
+│   └── container-basics.md  (build, push, deploy custom images)
+│
+├── exam-strategy.md         ← READ NIGHT BEFORE (time management + psychology)
+├── KUBECTL-CHEATSHEET.md    ← MUSCLE MEMORY (commands ranked by frequency)
+│
+└── exercises/               ← ORIGINAL CONTENT (14 hands-on challenges)
+    ├── 01-pod-basics/ ... 14-in-place-scaling/
+    └── Each has: README.md + solution.yaml + verify.sh
+
+```
+
+### 🚀 Recommended Study Timeline (3-4 Weeks)
+
+**Week 1: Pattern Foundation**
+- [ ] Read all 6 pattern files (patterns/)
+- [ ] Do each pattern 1-2× from memory
+- [ ] Target: Muscle-memory level
+
+**Week 2: Practice Speed**
+- [ ] Do all timed exercises (2-min, 5-min, 10-min)
+- [ ] Repeat each tier until <2 min over limit
+- [ ] Time yourself strictly
+
+**Week 3: Real Scenarios**
+- [ ] Do multi-step scenarios (3 scenarios, full workflow)
+- [ ] Practice broken scenarios (identify errors quickly)
+- [ ] Deep dive: RBAC + Networking (your weak spots)
+
+**Week 4: Full Simulation**
+- [ ] Take full mock exam (2 hours, no pause)
+- [ ] Score yourself: aim 80%+
+- [ ] Review wrong answers vs patterns
+- [ ] Final 2 days: Review COMMON-MISTAKES.md + exam-strategy.md
+
+### 📖 How to Use Each Section
+
+**If you have 10 min:**
+→ Read one pattern file (e.g., `rbac-debug.md`)
+
+**If you have 30 min:**
+→ Do one timed exercise (2-5 min tier)
+
+**If you have 1-2 hours:**
+→ Take the full mock exam
+
+**If you're stuck debugging:**
+→ Check `networking-debug.md` or check the specific pattern
+
+**If you made a mistake:**
+→ Find it in `COMMON-MISTAKES.md` (learn why it fails)
+
+**Night before exam:**
+→ Read `exam-strategy.md` (time mgmt, what to skip, red flags)
+
+### 🏆 Why This Structure Works
+
+1. **Patterns first**: 70% of exam is pattern-matching; 20 min studying patterns = hours saved in exam
+2. **Timed exercises**: Exam is time-pressure. Practice under pressure builds muscle memory
+3. **Broken scenarios**: Debugging is 60% of tasks. Learn to think systematically
+4. **Mock exam**: Full simulation reduces anxiety; you've "seen it before"
+5. **Multi-step**: Real exam combines multiple concepts; practice that flow
+6. **Cheat sheet**: Designed for speed, ranked by frequency
+
+---
+
 ### Repo Structure
 
 ```

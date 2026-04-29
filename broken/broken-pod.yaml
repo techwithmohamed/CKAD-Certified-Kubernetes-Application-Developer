@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken-pod
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: nginx:99.99  # BROKEN: Tag doesn't exist
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5  # BROKEN: Too short, app needs 15+ seconds
+
+---
+# PROBLEM: Pod stuck in CrashLoopBackOff or ImagePullBackOff
+#
+# SYMPTOMS:
+# $ kubectl get pod
+# broken-pod   0/1   ImagePullBackOff   0    2m
+# $ kubectl describe pod broken-pod
+# Events:
+#   Failed to pull image... image not found
+#
+# FIXES (choose one):
+# 1. kubectl set image pod/broken-pod app=nginx:latest
+# 2. OR edit: kubectl edit pod broken-pod
+#    Change: image: nginx:latest
+# 3. kubectl delete pod broken-pod
+#    (fix YAML manually)
+#    kubectl apply -f broken-pod.yaml
+#
+# For liveness issue:
+# $ kubectl delete pod broken-pod
+# (edit initialDelaySeconds: 15 or higher)
+# kubectl apply -f broken-pod.yaml
