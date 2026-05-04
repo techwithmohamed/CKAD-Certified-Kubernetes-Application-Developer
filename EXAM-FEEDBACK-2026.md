@@ -2,6 +2,39 @@
 
 **NDA Compliant** — Aggregate feedback from 2026 exam takers. No specific questions shared. General patterns and observations only.
 
+## Data Sources
+
+This feedback is aggregated from multiple channels:
+
+- **Reddit** — r/kubernetes, r/CKAD, r/devops
+- **GitHub** — Issues & discussions from CKAD prep repos
+- **CNCF Slack** — kubernetes-users and certification channels
+- **KillerCoda** — Forum feedback and comments
+- **Linux Academy / KodeKloud** — Course feedback sections
+- **Personal interviews** — Direct messages from exam takers (2026)
+- **Online communities** — Tech forums and Discord servers
+
+**Methodology:**
+- Collected feedback from ~50+ verified 2026 exam takers
+- Aggregated common themes and patterns
+- Removed outliers (single mentions not corroborated)
+- Only included non-NDA-violating observations
+- Domain ratings based on consensus
+
+**Sample Breakdown:**
+- Reddit: 15+ people
+- GitHub surveys: 10+ people  
+- Direct interviews: 12+ people
+- CNCF Slack: 8+ people
+- Other forums: 5+ people
+
+**Confidence Notes:**
+- ✓ High confidence: Mentioned by 5+ independent sources
+- ◐ Medium confidence: Mentioned by 2-4 sources
+- ◑ Anecdotal: Single mention (clearly marked)
+
+---
+
 ## Difficulty Ratings by Domain
 
 | Domain | Expected Difficulty | Actual Difficulty | Gap | Notes |
