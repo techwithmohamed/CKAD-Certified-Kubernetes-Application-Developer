@@ -26,9 +26,10 @@ Study materials and practice exercises for the Certified Kubernetes Application 
 - [START-HERE.md](START-HERE.md) — Entry point with study paths
 - [INDEX.md](INDEX.md) — Complete navigation and quick reference
 - [STUDY-PATHS.md](STUDY-PATHS.md) — Detailed daily schedules for each timeline
+- [EXAM-FEEDBACK-2026.md](EXAM-FEEDBACK-2026.md) — Real 2026 exam feedback and what actually appeared
 - [KUBECTL-CHEATSHEET.md](KUBECTL-CHEATSHEET.md) — Commands ranked by frequency
 - [exam-strategy.md](exam-strategy.md) — Time management and exam day tips
-- [basics/COMMON-MISTAKES.md](basics/COMMON-MISTAKES.md) — 20 common errors to avoid
+- [troubleshooting/basics/COMMON-MISTAKES.md](troubleshooting/basics/COMMON-MISTAKES.md) — 20 common errors to avoid
 
 ## Exam Details
 

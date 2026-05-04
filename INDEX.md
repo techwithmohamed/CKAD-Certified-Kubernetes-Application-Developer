@@ -30,6 +30,7 @@
 ## Reference Materials
 
 - [KUBECTL-CHEATSHEET.md](KUBECTL-CHEATSHEET.md) — Commands ranked by frequency
+- [EXAM-FEEDBACK-2026.md](EXAM-FEEDBACK-2026.md) — What actually appeared on 2026 exams (NDA-compliant feedback)
 - [exam-strategy.md](exam-strategy.md) — Time management, exam day tips
 - [skeletons/](skeletons/) — YAML templates for all resource types
 - [scripts/](scripts/) — Setup scripts for exam environment
