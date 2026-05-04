@@ -14,12 +14,12 @@ Study materials and practice exercises for the Certified Kubernetes Application 
 
 | Directory | What You Find |
 |-----------|---|
-| **patterns/** | 6 most-tested CKAD patterns with examples and verification |
-| **exercises/** | 14 hands-on exercises, speed drills, complex scenarios |
-| **mock-exams/** | Full-length practice exams (15 questions each, 2 hours) |
-| **troubleshooting/** | RBAC, networking, debugging, common mistakes, container basics |
-| **scripts/** | Setup scripts for exam environment config |
-| **skeletons/** | YAML templates for reference |
+| [**patterns/**](patterns/) | 6 most-tested CKAD patterns with examples and verification |
+| [**exercises/**](exercises/) | 14 hands-on exercises, speed drills, complex scenarios |
+| [**mock-exams/**](mock-exams/) | Full-length practice exams (15 questions each, 2 hours) |
+| [**troubleshooting/**](troubleshooting/) | RBAC, networking, debugging, common mistakes, container basics |
+| [**scripts/**](scripts/) | Setup scripts for exam environment config |
+| [**skeletons/**](skeletons/) | YAML templates for reference |
 
 ## Files to Bookmark
 
