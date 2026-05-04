@@ -17,15 +17,15 @@
 - [patterns/ingress-debug.md](patterns/ingress-debug.md) — Ingress routing issues
 
 ### Hands-on Practice
-- [exercises/](exercises/) — 14 complete exercises (all difficulty levels)
-- [timed/timed-exercises.md](timed/timed-exercises.md) — Speed drills (2-5-10 min)
-- [multi-step/multi-step-scenarios.md](multi-step/multi-step-scenarios.md) — Complex workflows
-- [broken/](broken/) — YAML files with intentional errors
+- [exercises/](exercises/) — 14 exercises, speed drills, complex workflows
+- [exercises/timed-exercises.md](exercises/timed-exercises.md) — Speed drills (2-5-10 min)
+- [exercises/multi-step-scenarios.md](exercises/multi-step-scenarios.md) — Complex workflows
+- [troubleshooting/broken/](troubleshooting/broken/) — YAML files with intentional errors
 
 ### Advanced Topics
-- [rbac/rbac-scenarios.md](rbac/rbac-scenarios.md) — RBAC edge cases
-- [networking/networking-debug.md](networking/networking-debug.md) — Network troubleshooting
-- [basics/COMMON-MISTAKES.md](basics/COMMON-MISTAKES.md) — 20 common errors
+- [troubleshooting/rbac/rbac-scenarios.md](troubleshooting/rbac/rbac-scenarios.md) — RBAC edge cases
+- [troubleshooting/networking/networking-debug.md](troubleshooting/networking/networking-debug.md) — Network troubleshooting
+- [troubleshooting/basics/COMMON-MISTAKES.md](troubleshooting/basics/COMMON-MISTAKES.md) — 20 common errors
 
 ## Reference Materials
 
@@ -47,24 +47,19 @@
 | Service shows 0 endpoints | [patterns/service-selector-mismatch.md](patterns/service-selector-mismatch.md) |
 | RBAC permission denied | [patterns/rbac-debug.md](patterns/rbac-debug.md) |
 | Ingress returns 503/404 | [patterns/ingress-debug.md](patterns/ingress-debug.md) |
-| Network traffic blocked | [networking/networking-debug.md](networking/networking-debug.md) |
+| Network traffic blocked | [troubleshooting/networking/networking-debug.md](troubleshooting/networking/networking-debug.md) |
 | CronJob not triggering | [patterns/cronjob-create.md](patterns/cronjob-create.md) |
-| Making silly mistakes | [basics/COMMON-MISTAKES.md](basics/COMMON-MISTAKES.md) |
+| Making silly mistakes | [troubleshooting/basics/COMMON-MISTAKES.md](troubleshooting/basics/COMMON-MISTAKES.md) |
 | Need to review syntax | [KUBECTL-CHEATSHEET.md](KUBECTL-CHEATSHEET.md) |
 | Confused about timing | [exam-strategy.md](exam-strategy.md) |
 
 ## Repo Structure
 
 ```
-exercises/          14 hands-on exercises
-mock-exams/         2 full mock exams
+exercises/          Hands-on exercises, drills, scenarios
+mock-exams/         Practice exams
 patterns/           6 core patterns
-rbac/               RBAC deep dive
-networking/         Network troubleshooting
-timed/              Speed drills
-multi-step/         Complex scenarios
-broken/             Debugging practice
-basics/             Common mistakes
+troubleshooting/    Debugging, RBAC, networking, mistakes
 scripts/            Setup scripts
 skeletons/          YAML templates
 ```
@@ -86,7 +81,7 @@ skeletons/          YAML templates
 - **Practice now:** [mock-exams/MOCK-EXAM-01.md](mock-exams/MOCK-EXAM-01.md)
 - **Commands:** [KUBECTL-CHEATSHEET.md](KUBECTL-CHEATSHEET.md)
 - **Exam tips:** [exam-strategy.md](exam-strategy.md)
-- **Mistakes to avoid:** [basics/COMMON-MISTAKES.md](basics/COMMON-MISTAKES.md)
+- **Mistakes to avoid:** [troubleshooting/basics/COMMON-MISTAKES.md](troubleshooting/basics/COMMON-MISTAKES.md)
 
 ## Files to Bookmark
 

@@ -33,13 +33,13 @@ Choose your study timeline based on available time.
 | Service has no endpoints | [patterns/service-selector-mismatch.md](patterns/service-selector-mismatch.md) |
 | RBAC permission denied | [patterns/rbac-debug.md](patterns/rbac-debug.md) |
 | Ingress not working | [patterns/ingress-debug.md](patterns/ingress-debug.md) |
-| Network traffic blocked | [networking/networking-debug.md](networking/networking-debug.md) |
+| Network blocked | [troubleshooting/networking/networking-debug.md](troubleshooting/networking/networking-debug.md) |
 | CronJob not running | [patterns/cronjob-create.md](patterns/cronjob-create.md) |
 
 ## Quick References
 
 - kubectl commands: [KUBECTL-CHEATSHEET.md](KUBECTL-CHEATSHEET.md)
-- Common mistakes: [basics/COMMON-MISTAKES.md](basics/COMMON-MISTAKES.md)
+- Common mistakes: [troubleshooting/basics/COMMON-MISTAKES.md](troubleshooting/basics/COMMON-MISTAKES.md)
 - Full index: [INDEX.md](INDEX.md)
 - Exam strategy: [exam-strategy.md](exam-strategy.md)
 

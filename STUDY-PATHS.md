@@ -16,10 +16,10 @@
 - Read: [patterns/networkpolicy-allow-deny.md](patterns/networkpolicy-allow-deny.md)
 - Read: [patterns/cronjob-create.md](patterns/cronjob-create.md)
 - Read: [patterns/ingress-debug.md](patterns/ingress-debug.md)
-- Practice: [timed/timed-exercises.md](timed/timed-exercises.md) (2-min, 5-min tasks)
+- Practice: [exercises/timed-exercises.md](exercises/timed-exercises.md) (2-min, 5-min tasks)
 
 ### Day 5: Scenarios + Commands
-- Practice: [multi-step/multi-step-scenarios.md](multi-step/multi-step-scenarios.md)
+- Practice: [exercises/multi-step-scenarios.md](exercises/multi-step-scenarios.md)
 - Reference: [KUBECTL-CHEATSHEET.md](KUBECTL-CHEATSHEET.md)
 
 ### Day 6: Mock Exam
@@ -29,7 +29,7 @@
 
 ### Day 7: Final Review
 - Redo failed questions from mock exam
-- Read: [basics/COMMON-MISTAKES.md](basics/COMMON-MISTAKES.md)
+- Read: [troubleshooting/basics/COMMON-MISTAKES.md](troubleshooting/basics/COMMON-MISTAKES.md)
 - Read: [exam-strategy.md](exam-strategy.md)
 - Rest
 
@@ -52,7 +52,7 @@
 
 **Wed-Thu:** Practice exercises and timed drills (4-5 hours each)
 - [exercises/](exercises/)
-- [timed/timed-exercises.md](timed/timed-exercises.md)
+- [exercises/timed-exercises.md](exercises/timed-exercises.md)
 
 **Fri:** Mock exam + review
 - [mock-exams/MOCK-EXAM-01.md](mock-exams/MOCK-EXAM-01.md)
@@ -61,10 +61,10 @@
 
 ### Week 2
 **Mon-Wed:** Deeper practice
-- [multi-step/multi-step-scenarios.md](multi-step/multi-step-scenarios.md)
-- [rbac/rbac-scenarios.md](rbac/rbac-scenarios.md)
-- [networking/networking-debug.md](networking/networking-debug.md)
-- [broken/](broken/) (debug broken YAML)
+- [exercises/multi-step-scenarios.md](exercises/multi-step-scenarios.md)
+- [troubleshooting/rbac/rbac-scenarios.md](troubleshooting/rbac/rbac-scenarios.md)
+- [troubleshooting/networking/networking-debug.md](troubleshooting/networking/networking-debug.md)
+- [troubleshooting/broken/](troubleshooting/broken/) (debug broken YAML)
 
 **Thu:** Mock exam 2
 - [mock-exams/MOCK-EXAM-02.md](mock-exams/MOCK-EXAM-02.md)
@@ -95,8 +95,8 @@
 - Sat: Take mock exam ([mock-exams/MOCK-EXAM-01.md](mock-exams/MOCK-EXAM-01.md))
 
 ### Week 3: Advanced Scenarios + Troubleshooting
-- Mon-Wed: [multi-step/multi-step-scenarios.md](multi-step/multi-step-scenarios.md) + [rbac/rbac-scenarios.md](rbac/rbac-scenarios.md) + [networking/networking-debug.md](networking/networking-debug.md) (3 hours/day)
-- Thu: [broken/](broken/) debugging scenarios (2 hours)
+- Mon-Wed: [exercises/multi-step-scenarios.md](exercises/multi-step-scenarios.md) + [troubleshooting/rbac/rbac-scenarios.md](troubleshooting/rbac/rbac-scenarios.md) + [troubleshooting/networking/networking-debug.md](troubleshooting/networking/networking-debug.md) (3 hours/day)
+- Thu: [troubleshooting/broken/](troubleshooting/broken/) debugging scenarios (2 hours)
 - Fri: Take second mock exam ([mock-exams/MOCK-EXAM-02.md](mock-exams/MOCK-EXAM-02.md))
 - Sat: Review results
 
